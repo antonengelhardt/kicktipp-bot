@@ -18,7 +18,21 @@ This script can automatically enter tips into Kicktipp based on the quotes of th
 
     It is recommended to place the executable in the same directory as the script or into the Applications folder.
 
-5. Set the constants `EMAIL` and `PASSWORD` `DAY_OF_EXECUTION` and  `NAME_OF_COMPETITON` to your Kicktipp credentials to the day on which the script should be executed. 0 corresponds to Sunday and 6 to Saturday. It is recommended to set it to 3 (Wednesday) or 4 (Thursday).
+5. Set the constants `EMAIL`, `PASSWORD`, `DAY_OF_EXECUTION` and `NAME_OF_COMPETITON` as environment variables to your Kicktipp credentials to the day on which the script should be executed. 0 corresponds to Sunday and 6 to Saturday. It is recommended to set it to 3 (Wednesday) or 4 (Thursday).
+
+    or zsh:
+
+    ```echo 'export KICKTIPP_EMAIL=<KICKTIPP_EMAIL>' >> ~/.zshenv```  
+       echo 'export KICKTIPP_PASSWORD=<KICKTIPP_PASSWORD>' >> ~/.zshenv  
+       echo 'export KICKTIPP_DAY_OF_EXECUTION=<DAY_OF_EXECUTION>' >> ~/.zshenv  
+       echo 'export KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION>' >> ~/.zshenv```
+
+    For bash:
+
+    ```echo 'export KICKTIPP_EMAIL=<KICKTIPP_EMAIL>' >> ~/.bash_profile```  
+        echo 'export KICKTIPP_PASSWORD=<KICKTIPP_PASSWORD>' >> ~/.bash_profile  
+        echo 'export KICKTIPP_DAY_OF_EXECUTION=<DAY_OF_EXECUTION>' >> ~/.bash_profile  
+        echo 'export KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION>' >> ~/.bash_profile```
 
 6. Select the driver you need by commenting out the unneeded driver in the `main` function.
 
