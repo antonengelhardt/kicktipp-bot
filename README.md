@@ -22,14 +22,14 @@ This script can automatically enter tips into Kicktipp based on the quotes of th
 
     or zsh:
 
-    ```echo 'export KICKTIPP_EMAIL=<KICKTIPP_EMAIL>' >> ~/.zshenv```  
+    ```echo 'export KICKTIPP_EMAIL=<KICKTIPP_EMAIL>' >> ~/.zshenv  
        echo 'export KICKTIPP_PASSWORD=<KICKTIPP_PASSWORD>' >> ~/.zshenv  
        echo 'export KICKTIPP_DAY_OF_EXECUTION=<DAY_OF_EXECUTION>' >> ~/.zshenv  
        echo 'export KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION>' >> ~/.zshenv```
 
     For bash:
 
-    ```echo 'export KICKTIPP_EMAIL=<KICKTIPP_EMAIL>' >> ~/.bash_profile```  
+    ```echo 'export KICKTIPP_EMAIL=<KICKTIPP_EMAIL>' >> ~/.bash_profile  
         echo 'export KICKTIPP_PASSWORD=<KICKTIPP_PASSWORD>' >> ~/.bash_profile  
         echo 'export KICKTIPP_DAY_OF_EXECUTION=<DAY_OF_EXECUTION>' >> ~/.bash_profile  
         echo 'export KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION>' >> ~/.bash_profile```
