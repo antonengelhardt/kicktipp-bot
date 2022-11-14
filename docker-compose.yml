@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+  bot:
+    image: antonengelhardt/kicktipp-bot:latest
+    container_name: kicktipp-bot
+    restart: always
+    environment:
+      - KICKTIPP_EMAIL=
+      - KICKTIPP_PASSWORD=
+      - KICKTIPP_NAME_OF_COMPETITION=buli22-23chefs
+      - DAY_OF_EXECUTION=3
