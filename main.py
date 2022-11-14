@@ -4,9 +4,9 @@ from datetime import datetime
 from time import sleep
 
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 
 # Constants
 
@@ -16,15 +16,15 @@ EMAIL = os.getenv("KICKTIPP_EMAIL")
 PASSWORD = os.getenv("KICKTIPP_PASSWORD")
 NAME_OF_COMPETITION = os.getenv("KICKTIPP_NAME_OF_COMPETITION")
 CHROMEDRIVER_PATH = "/Applications/chromedriver"
-# DAY_OF_EXECUTION = os.getenv("DAY_OF_EXECUTION")  # wednesday
-DAY_OF_EXECUTION = 1
+DAY_OF_EXECUTION = os.getenv("DAY_OF_EXECUTION")  # wednesday
+# DAY_OF_EXECUTION = 1
 
 
 def execute():
 
     # create driver
-    # driver = webdriver.Chrome(options=set_chrome_options()) # for docker
-    driver = webdriver.Chrome(CHROMEDRIVER_PATH)  # for local
+    driver = webdriver.Chrome(options=set_chrome_options())  # for docker
+    # driver = webdriver.Chrome(CHROMEDRIVER_PATH)  # for local
 
     # login
     driver.get(LOGIN_URL)
@@ -78,7 +78,7 @@ def execute():
                                                value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[4]/input[2]')
             homeTipEntry.clear()
             homeTipEntry.send_keys(tip[0])
-            
+
             # find entry, clear it and enter tip
             awayTipEntry = driver.find_element(by=By.XPATH,
                                                value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[4]/input[3]')
@@ -93,7 +93,7 @@ def execute():
     sleep(10)
 
 
-def calculate_tip(home, draw, away) -> (int, int):
+def calculate_tip(home, draw, away):
     """ Calculates the tip based on the quotes"""
 
     # if negative the home team is more likely to win
@@ -141,6 +141,6 @@ if __name__ == '__main__':
             execute()
             sleep(60 * 60 * 24)  # sleep for 24 hours
 
-        print(datetime.now().strftime("%d-%m-%y") + ": Sleeping! Day of week is " +
-              formatted + " and day of execution is " + str(DAY_OF_EXECUTION))
+        print(datetime.now().strftime("%d-%m-%y %H:%M:%S") + ": Sleeping! Day of week is " +
+                formatted + " and day of execution is " + str(DAY_OF_EXECUTION))
         sleep(30)
