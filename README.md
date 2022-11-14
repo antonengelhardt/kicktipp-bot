@@ -52,10 +52,14 @@ This script can automatically enter tips into Kicktipp based on the quotes of th
 
 2. Install Docker (<https://docs.docker.com/get-docker/>)
 
-3. Pull the image from Docker Hub
+3. Pull the image from Docker Hub or build it yourself
 
     ```bash
     docker pull antonengelhardt/kicktipp-bot
+
+    # or 
+
+    docker build -t antonengelhardt/kicktipp-bot .
     ```
 
 4. Run the container in the foreground
