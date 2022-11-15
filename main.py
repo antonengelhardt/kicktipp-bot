@@ -50,7 +50,7 @@ def execute():
 
     rows = driver.find_elements(by=By.CLASS_NAME, value="datarow")
     count = rows.__len__()
-    
+
     # iterate over rows of the form
     for i in range(1, count + 1):
         try:
@@ -76,17 +76,17 @@ def execute():
             print("Tip:" + str(tip))
             print()
 
-            # find entry, clear it and enter tip
+            # find entry, enter if empty
             homeTipEntry = driver.find_element(by=By.XPATH,
                                                value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[4]/input[2]')
-            homeTipEntry.clear()
-            homeTipEntry.send_keys(tip[0])
+            if homeTipEntry.get_attribute('value') == '':
+                homeTipEntry.send_keys(tip[0])
 
-            # find entry, clear it and enter tip
+            # find entry, enter if empty
             awayTipEntry = driver.find_element(by=By.XPATH,
                                                value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[4]/input[3]')
-            awayTipEntry.clear()
-            awayTipEntry.send_keys(tip[1])
+            if awayTipEntry.get_attribute('value') == '':
+                awayTipEntry.send_keys(tip[1])
         except NoSuchElementException:
             continue
     # submit all tips
