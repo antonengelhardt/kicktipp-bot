@@ -17,11 +17,12 @@ PASSWORD = os.getenv("KICKTIPP_PASSWORD")
 NAME_OF_COMPETITION = os.getenv("KICKTIPP_NAME_OF_COMPETITION")
 CHROMEDRIVER_PATH = "/Applications/chromedriver"
 
+
 def execute():
 
     # create driver
-    driver = webdriver.Chrome(options=set_chrome_options())  # for docker
-    # driver = webdriver.Chrome(CHROMEDRIVER_PATH)  # for local
+    # driver = webdriver.Chrome(options=set_chrome_options())  # for docker
+    driver = webdriver.Chrome(CHROMEDRIVER_PATH)  # for local
 
     # login
     driver.get(LOGIN_URL)
@@ -51,39 +52,43 @@ def execute():
     # iterate over rows of the form
     for i in range(1, count + 1):
         try:
-            # find quotes
-            quotes = driver.find_element(
-                by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[5]/a')
-            content = quotes.get_property('innerHTML')
-            # split quotes by seperator
-            splitted = str.split(content, sep=' / ')
-
-            # get Team names
-            homeTeam = driver.find_element(
-                by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[2]').get_attribute('innerHTML')
-            awayTeam = driver.find_element(
-                by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[3]').get_attribute('innerHTML')
-
-            # print quotes and team names
-            print(homeTeam + " - " + awayTeam + "\nQuotes:" + str(splitted))
-
-            # calculate tips bases on quotes and print them
-            tip = calculate_tip(float(splitted[0]), float(
-                splitted[1]), float(splitted[2]))
-            print("Tip:" + str(tip))
-            print()
-
             # find entry, enter if empty
             homeTipEntry = driver.find_element(by=By.XPATH,
                                                value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[4]/input[2]')
-            if homeTipEntry.get_attribute('value') == '':
-                homeTipEntry.send_keys(tip[0])
-
-            # find entry, enter if empty
             awayTipEntry = driver.find_element(by=By.XPATH,
                                                value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[4]/input[3]')
-            if awayTipEntry.get_attribute('value') == '':
+
+            # only calc tip and enter, when not entered already
+            if homeTipEntry.get_attribute('value') == '' and awayTipEntry.get_attribute('value') == '':
+
+                # find quotes
+                quotes = driver.find_element(
+                    by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[5]/a')
+                content = quotes.get_property('innerHTML')
+                # split quotes by seperator
+                splitted = str.split(content, sep=' / ')
+
+                # get Team names
+                homeTeam = driver.find_element(
+                    by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[2]').get_attribute('innerHTML')
+                awayTeam = driver.find_element(
+                    by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[3]').get_attribute('innerHTML')
+
+                # print quotes and team names
+                print(homeTeam + " - " + awayTeam +
+                      "\nQuotes:" + str(splitted))
+
+                # calculate tips bases on quotes and print them
+                tip = calculate_tip(float(splitted[0]), float(
+                    splitted[1]), float(splitted[2]))
+                print("Tip:" + str(tip))
+                print()
+
+                homeTipEntry.send_keys(tip[0])
                 awayTipEntry.send_keys(tip[1])
+
+            # find entry, enter if empty
+
         except NoSuchElementException:
             continue
     # submit all tips
@@ -92,6 +97,11 @@ def execute():
     # sleep to display browser
     # sleep(10)
     
+    try:
+        print("Total bet: " + driver.find_element(by=By.XPATH, value='//*[@id="kicktipp-content"]/div[2]/div[2]/a/div/div[1]/div[1]/div[1]/div[2]/span[2]'))
+    except NoSuchElementException:
+        pass
+        
     driver.quit()
 
 
