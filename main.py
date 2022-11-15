@@ -16,15 +16,15 @@ EMAIL = os.getenv("KICKTIPP_EMAIL")
 PASSWORD = os.getenv("KICKTIPP_PASSWORD")
 NAME_OF_COMPETITION = os.getenv("KICKTIPP_NAME_OF_COMPETITION")
 CHROMEDRIVER_PATH = "/Applications/chromedriver"
-DAY_OF_EXECUTION = os.getenv("DAY_OF_EXECUTION")  # wednesday
-# DAY_OF_EXECUTION = 1
+# DAY_OF_EXECUTION = os.getenv("DAY_OF_EXECUTION")  # wednesday
+DAY_OF_EXECUTION = 2
 
 
 def execute():
 
     # create driver
-    driver = webdriver.Chrome(options=set_chrome_options())  # for docker
-    # driver = webdriver.Chrome(CHROMEDRIVER_PATH)  # for local
+    # driver = webdriver.Chrome(options=set_chrome_options())  # for docker
+    driver = webdriver.Chrome(CHROMEDRIVER_PATH)  # for local
 
     # login
     driver.get(LOGIN_URL)
@@ -48,8 +48,11 @@ def execute():
     # entry form
     driver.get(F"https://www.kicktipp.de/{NAME_OF_COMPETITION}/tippabgabe")
 
+    rows = driver.find_elements(by=By.CLASS_NAME, value="datarow")
+    count = rows.__len__()
+    
     # iterate over rows of the form
-    for i in range(1, 10):
+    for i in range(1, count + 1):
         try:
             # find quotes
             quotes = driver.find_element(
@@ -91,6 +94,8 @@ def execute():
 
     # sleep to display browser
     sleep(10)
+    
+    driver.quit()
 
 
 def calculate_tip(home, draw, away):
@@ -139,8 +144,9 @@ if __name__ == '__main__':
         if formatted == str(DAY_OF_EXECUTION):
             print("The Script will execute now!")
             execute()
+            print("The Script has finished!")
             sleep(60 * 60 * 24)  # sleep for 24 hours
 
         print(datetime.now().strftime("%d-%m-%y %H:%M:%S") + ": Sleeping! Day of week is " +
-                formatted + " and day of execution is " + str(DAY_OF_EXECUTION))
-        sleep(30)
+              formatted + " and day of execution is " + str(DAY_OF_EXECUTION))
+        sleep(60*5)
