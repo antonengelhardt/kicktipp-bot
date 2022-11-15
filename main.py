@@ -21,8 +21,8 @@ CHROMEDRIVER_PATH = "/Applications/chromedriver"
 def execute():
 
     # create driver
-    # driver = webdriver.Chrome(options=set_chrome_options())  # for docker
-    driver = webdriver.Chrome(CHROMEDRIVER_PATH)  # for local
+    driver = webdriver.Chrome(options=set_chrome_options())  # for docker
+    # driver = webdriver.Chrome(CHROMEDRIVER_PATH)  # for local
 
     # login
     driver.get(LOGIN_URL)
@@ -86,13 +86,13 @@ def execute():
 
                 homeTipEntry.send_keys(tip[0])
                 awayTipEntry.send_keys(tip[1])
-
-            # find entry, enter if empty
+                
+              # submit all tips
 
         except NoSuchElementException:
             continue
-    # submit all tips
-    driver.find_element(by=By.NAME, value="submitbutton").click()
+    sleep(1)
+    driver.find_element(by=By.NAME, value="submitbutton").submit()
 
     # sleep to display browser
     # sleep(10)
@@ -115,7 +115,7 @@ def calculate_tip(home, draw, away):
     onemore = round(random.uniform(0, 1))
 
     # depending on the quotes, the factor is derived to decrease the tip for very unequal games
-    coefficient = 0.3 if abs(differenceHomeAndAway) > 8 else 0.8
+    coefficient = 0.3 if round(abs(differenceHomeAndAway)) > 7 else 0.8
 
     # calculate tips
     if abs(differenceHomeAndAway) < 0.25:
@@ -145,7 +145,7 @@ def set_chrome_options() -> None:
 
 if __name__ == '__main__':
     while True:
-        print("The script will now execute")
+        print("The script will execute now")
         execute()
         print("The script has finished. Sleeping for 1 hour")
         sleep(60*60)
