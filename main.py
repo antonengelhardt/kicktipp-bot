@@ -49,8 +49,7 @@ def execute():
     # entry form
     driver.get(F"https://www.kicktipp.de/{NAME_OF_COMPETITION}/tippabgabe")
 
-    rows = driver.find_elements(by=By.CLASS_NAME, value="datarow")
-    count = rows.__len__()
+    count = driver.find_elements(by=By.CLASS_NAME, value="datarow").__len__()
 
     # iterate over rows of the form
     for i in range(1, count + 1):
@@ -79,29 +78,31 @@ def execute():
                       "\nQuotes:" + str(quotes))
 
                 # calculate tips bases on quotes and print them
-                tip = calculate_tip(float(quotes[0]), float(
-                    quotes[1]), float(quotes[2]))
+                tip = calculate_tip(float(quotes[0]), float(quotes[1]), float(quotes[2]))
                 print("Tip:" + str(tip))
                 print()
 
                 homeTipEntry.send_keys(tip[0])
                 awayTipEntry.send_keys(tip[1])
-                
+
               # submit all tips
 
         except NoSuchElementException:
             continue
-    sleep(1)
+    sleep(0.1)
+
+    #submit all tips
     driver.find_element(by=By.NAME, value="submitbutton").submit()
 
-    # sleep to display browser
-    # sleep(10)
-    
+    if sys.argv[1] == 'local':
+        sleep(20)
+
     try:
-        print("Total bet: " + driver.find_element(by=By.XPATH, value='//*[@id="kicktipp-content"]/div[2]/div[2]/a/div/div[1]/div[1]/div[1]/div[2]/span[2]'))
+        print("Total bet: " + driver.find_element(by=By.XPATH,
+              value='//*[@id="kicktipp-content"]/div[2]/div[2]/a/div/div[1]/div[1]/div[1]/div[2]/span[2]'))
     except NoSuchElementException:
         pass
-        
+
     driver.quit()
 
 
@@ -115,7 +116,7 @@ def calculate_tip(home, draw, away):
     onemore = round(random.uniform(0, 1))
 
     # depending on the quotes, the factor is derived to decrease the tip for very unequal games
-    coefficient = 0.3 if round(abs(differenceHomeAndAway)) > 7 else 0.8
+    coefficient = 0.3 if round(abs(differenceHomeAndAway)) > 7 else 0.75
 
     # calculate tips
     if abs(differenceHomeAndAway) < 0.25:
