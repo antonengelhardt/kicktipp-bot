@@ -2,6 +2,7 @@ import os
 import random
 import sys
 from datetime import datetime
+from datetime import timedelta
 from time import sleep
 
 from selenium import webdriver
@@ -22,10 +23,15 @@ CHROMEDRIVER_PATH = "/Applications/chromedriver"
 def execute():
 
     # create driver
-    if sys.argv[1] == 'headless':
-        driver = webdriver.Chrome(options=set_chrome_options())  # for docker
-    elif sys.argv[1] == 'local':
-        driver = webdriver.Chrome(CHROMEDRIVER_PATH)  # for local
+    try:
+        if sys.argv[1] == 'headless':
+            driver = webdriver.Chrome(
+                options=set_chrome_options())  # for docker
+        elif sys.argv[1] == 'local':
+            driver = webdriver.Chrome()  # for local
+    except IndexError:
+        print('Debug Mode\n')
+        driver = webdriver.Chrome()  # debug
 
     # login
     driver.get(LOGIN_URL)
@@ -63,9 +69,10 @@ def execute():
             # only calc tip and enter, when not entered already
             if homeTipEntry.get_attribute('value') == '' and awayTipEntry.get_attribute('value') == '':
 
-                # find quotes
-                quotes = driver.find_element(
-                    by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[5]/a').get_property('innerHTML').split(sep=" / ")
+                # time of game
+                time = datetime.strptime(
+                    driver.find_element(by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[1]').get_property('innerHTML'), 
+                    '%d.%m.%y %H:%M')
 
                 # get Team names
                 homeTeam = driver.find_element(
@@ -73,34 +80,55 @@ def execute():
                 awayTeam = driver.find_element(
                     by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[3]').get_attribute('innerHTML')
 
-                # print quotes and team names
+                # find quotes
+                quotes = driver.find_element(
+                    by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[5]/a').get_property('innerHTML').split(sep=" / ")
+
+                # print time and team names
                 print(homeTeam + " - " + awayTeam +
-                      "\nQuotes:" + str(quotes))
+                      "\nTime: " + str(time))
 
-                # calculate tips bases on quotes and print them
-                tip = calculate_tip(float(quotes[0]), float(quotes[1]), float(quotes[2]))
-                print("Tip:" + str(tip))
-                print()
+                # time until start of game
+                timeUntilGame = time - datetime.now()
+                print("Time until game: " + str(timeUntilGame))
 
-                homeTipEntry.send_keys(tip[0])
-                awayTipEntry.send_keys(tip[1])
+                # only tip if game starts in less than 2 hours
+                if timeUntilGame < timedelta(hours=2):
+                    print("Game starts in less than 2 hours. Tipping now...")
+                    
+                    # print quotes
+                    print("Quotes:" + str(quotes))
 
-              # submit all tips
+                    # calculate tips bases on quotes and print them
+                    tip = calculate_tip(float(quotes[0]), float(
+                        quotes[1]), float(quotes[2]))
+                    print("Tip:" + str(tip))
+                    print()
+
+                    homeTipEntry.send_keys(tip[0])
+                    awayTipEntry.send_keys(tip[1])
+                else:
+                    print("Game starts in more than 2 hours. Skipping...")
+                    print()
 
         except NoSuchElementException:
             continue
     sleep(0.1)
 
-    #submit all tips
+    # submit all tips
     driver.find_element(by=By.NAME, value="submitbutton").submit()
 
-    if sys.argv[1] == 'local':
-        sleep(20)
+    # print Quotes
+    try:
+        print("Total bet: " + str(driver.find_element(by=By.XPATH,
+              value='//*[@id="kicktipp-content"]/div[3]/div[2]/a/div/div[1]/div[1]/div[1]/div[2]/span[2]').get_property('innerHTML').replace('&nbsp;', '')))
+    except NoSuchElementException:
+        print("Total bet not found")
 
     try:
-        print("Total bet: " + driver.find_element(by=By.XPATH,
-              value='//*[@id="kicktipp-content"]/div[2]/div[2]/a/div/div[1]/div[1]/div[1]/div[2]/span[2]'))
-    except NoSuchElementException:
+        if sys.argv[1] == 'local':
+            sleep(20)
+    except IndexError:
         pass
 
     driver.quit()
@@ -146,7 +174,7 @@ def set_chrome_options() -> None:
 
 if __name__ == '__main__':
     while True:
-        print("The script will execute now")
+        print("The script will execute now!\n")
         execute()
-        print("The script has finished. Sleeping for 1 hour")
+        print("The script has finished. Sleeping for 1 hour...\n")
         sleep(60*60)
