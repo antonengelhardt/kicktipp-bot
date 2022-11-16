@@ -60,13 +60,15 @@ This script can automatically enter tips into Kicktipp based on the quotes of th
     docker build -t antonengelhardt/kicktipp-bot .
     ```
 
-4. Run the container in the foreground
+4. Select the driver you need by commenting out the unneeded driver in the `main` function.
+
+5. Run the container in the foreground
 
     ```bash
     docker run -it --name kicktipp-bot -e KICKTIPP_EMAIL=<YOUR_EMAIL> -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> antonengelhardt/kicktipp-bot
     ```
 
-5. Run the container in the background
+6. Run the container in the background
 
     ```bash
     docker run -d --name kicktipp-bot -e KICKTIPP_EMAIL=<YOUR_EMAIL> -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> antonengelhardt/kicktipp-bot
