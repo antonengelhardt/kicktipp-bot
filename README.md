@@ -60,7 +60,11 @@ docker run -it --name kicktipp-bot -e KICKTIPP_EMAIL=<YOUR_EMAIL> -e KICKTIPP_PA
 
 7. Execute the script
 
-    ```python3 main.py```
+    ```bash
+    python3 main.py local # with GUI
+    # or
+    python3 main.py headless # without GUI
+    ```
 
 ## Setup when running with Docker
 
