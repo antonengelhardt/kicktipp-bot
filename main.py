@@ -1,5 +1,6 @@
 import os
 import random
+import sys
 from datetime import datetime
 from time import sleep
 
@@ -21,8 +22,10 @@ CHROMEDRIVER_PATH = "/Applications/chromedriver"
 def execute():
 
     # create driver
-    driver = webdriver.Chrome(options=set_chrome_options())  # for docker
-    # driver = webdriver.Chrome(CHROMEDRIVER_PATH)  # for local
+    if sys.argv[1] == 'headless':
+        driver = webdriver.Chrome(options=set_chrome_options())  # for docker
+    elif sys.argv[1] == 'local':
+        driver = webdriver.Chrome(CHROMEDRIVER_PATH)  # for local
 
     # login
     driver.get(LOGIN_URL)
@@ -63,10 +66,7 @@ def execute():
 
                 # find quotes
                 quotes = driver.find_element(
-                    by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[5]/a')
-                content = quotes.get_property('innerHTML')
-                # split quotes by seperator
-                splitted = str.split(content, sep=' / ')
+                    by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[5]/a').get_property('innerHTML').split(sep=" / ")
 
                 # get Team names
                 homeTeam = driver.find_element(
@@ -76,11 +76,11 @@ def execute():
 
                 # print quotes and team names
                 print(homeTeam + " - " + awayTeam +
-                      "\nQuotes:" + str(splitted))
+                      "\nQuotes:" + str(quotes))
 
                 # calculate tips bases on quotes and print them
-                tip = calculate_tip(float(splitted[0]), float(
-                    splitted[1]), float(splitted[2]))
+                tip = calculate_tip(float(quotes[0]), float(
+                    quotes[1]), float(quotes[2]))
                 print("Tip:" + str(tip))
                 print()
 
