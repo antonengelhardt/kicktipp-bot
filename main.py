@@ -71,7 +71,8 @@ def execute():
 
                 # time of game
                 time = datetime.strptime(
-                    driver.find_element(by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[1]').get_property('innerHTML'), 
+                    driver.find_element(
+                        by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[1]').get_property('innerHTML'),
                     '%d.%m.%y %H:%M')
 
                 # get Team names
@@ -86,7 +87,7 @@ def execute():
 
                 # print time and team names
                 print(homeTeam + " - " + awayTeam +
-                      "\nTime: " + str(time))
+                      "\nTime: " + str(time.strftime('%d.%m.%y %H:%M')))
 
                 # time until start of game
                 timeUntilGame = time - datetime.now()
@@ -95,7 +96,7 @@ def execute():
                 # only tip if game starts in less than 2 hours
                 if timeUntilGame < timedelta(hours=2):
                     print("Game starts in less than 2 hours. Tipping now...")
-                    
+
                     # print quotes
                     print("Quotes:" + str(quotes))
 
@@ -105,6 +106,7 @@ def execute():
                     print("Tip:" + str(tip))
                     print()
 
+                    # send tips
                     homeTipEntry.send_keys(tip[0])
                     awayTipEntry.send_keys(tip[1])
                 else:
@@ -121,12 +123,16 @@ def execute():
     # print Quotes
     try:
         print("Total bet: " + str(driver.find_element(by=By.XPATH,
-              value='//*[@id="kicktipp-content"]/div[3]/div[2]/a/div/div[1]/div[1]/div[1]/div[2]/span[2]').get_property('innerHTML').replace('&nbsp;', '')))
+              value='//*[@id="kicktipp-content"]/div[3]/div[2]/a/div/div[1]/div[1]/div[1]/div[2]/span[2]')
+                                  .get_property('innerHTML')
+                                  .replace('&nbsp;', ''))
+              + "\n")
     except NoSuchElementException:
         print("Total bet not found")
 
     try:
         if sys.argv[1] == 'local':
+            print("Sleeping for 20secs to see the result - Debug Mode\n")
             sleep(20)
     except IndexError:
         pass
@@ -174,7 +180,9 @@ def set_chrome_options() -> None:
 
 if __name__ == '__main__':
     while True:
-        print("The script will execute now!\n")
+        now = datetime.now().strftime('%d.%m.%y %H:%M')
+        print(now + ": The script will execute now!\n")
         execute()
-        print("The script has finished. Sleeping for 1 hour...\n")
+        now = datetime.now().strftime('%d.%m.%y %H:%M')
+        print(now + ": The script has finished. Sleeping for 1 hour...\n")
         sleep(60*60)
