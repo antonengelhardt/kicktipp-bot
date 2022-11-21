@@ -130,8 +130,6 @@ def execute():
 
                     response = requests.request("POST", url, headers=headers, data=payload, files=files)
 
-                    print(response.text)
-
                 else:
                     print("Game starts in more than 2 hours. Skipping...")
                     print()
