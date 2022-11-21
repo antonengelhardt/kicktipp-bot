@@ -19,6 +19,7 @@ EMAIL = os.getenv("KICKTIPP_EMAIL")
 PASSWORD = os.getenv("KICKTIPP_PASSWORD")
 NAME_OF_COMPETITION = os.getenv("KICKTIPP_NAME_OF_COMPETITION")
 CHROMEDRIVER_PATH = "/Applications/chromedriver"
+ZAPIER_URL = os.getenv("ZAPIER_URL")
 
 
 def execute():
@@ -104,31 +105,33 @@ def execute():
                     # calculate tips bases on quotes and print them
                     tip = calculate_tip(float(quotes[0]), float(
                         quotes[1]), float(quotes[2]))
-                    print("Tip:" + str(tip))
+                    print("Tip: " + str(tip))
                     print()
 
                     # send tips
                     homeTipEntry.send_keys(tip[0])
                     awayTipEntry.send_keys(tip[1])
-                    
-                    # custom webhook to zapier
-                    url = "https://hooks.zapier.com/hooks/catch/13687251/bpxyhjt/"
 
-                    payload={
-                    'date': time,
-                    'team1': homeTeam,
-                    'team2': awayTeam,
-                    'quoteteam1': quotes[0],
-                    'quotedraw': quotes[1],
-                    'quoteteam2': quotes[2],
-                    'tipteam1': tip[0],
-                    'tipteam2': tip[1]}
-                    files=[
+                    # custom webhook to zapier
+                    # comment this out if you don't want to use it
+                    url = ZAPIER_URL
+
+                    payload = {
+                        'date': time,
+                        'team1': homeTeam,
+                        'team2': awayTeam,
+                        'quoteteam1': quotes[0],
+                        'quotedraw': quotes[1],
+                        'quoteteam2': quotes[2],
+                        'tipteam1': tip[0],
+                        'tipteam2': tip[1]}
+                    files = [
 
                     ]
                     headers = {}
 
-                    response = requests.request("POST", url, headers=headers, data=payload, files=files)
+                    response = requests.request(
+                        "POST", url, headers=headers, data=payload, files=files)
 
                 else:
                     print("Game starts in more than 2 hours. Skipping...")

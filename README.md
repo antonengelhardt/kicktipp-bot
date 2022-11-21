@@ -20,6 +20,10 @@ docker pull antonengelhardt/kicktipp-bot
 docker run -it --name kicktipp-bot -e KICKTIPP_EMAIL=<YOUR_EMAIL> -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> antonengelhardt/kicktipp-bot
 ```
 
+## Zapier Integration
+
+If you want to receive a notification when the script tips for a match, you can use the Zapier integration. Please create a Zapier Account and set up the following Trigger: Custom Webhook. Please also make sure you set the ENV Variable `ZAPIER_URL` to the URL of your custom webhook. Then you can set up actions like sending an email or a push notification.
+
 ## Setup when running without Docker
 
 1. Clone the repository
@@ -46,6 +50,8 @@ docker run -it --name kicktipp-bot -e KICKTIPP_EMAIL=<YOUR_EMAIL> -e KICKTIPP_PA
     echo 'export KICKTIPP_EMAIL=<KICKTIPP_EMAIL>' >> ~/.zshenv  
     echo 'export KICKTIPP_PASSWORD=<KICKTIPP_PASSWORD>' >> ~/.zshenv   
     echo 'export KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION>' >> ~/.zshenv
+    # ZAPIER_URL is optional
+    echo 'export ZAPIER_URL=<ZAPIER_URL>' >> ~/.zshenv
     ```
 
     For bash:
@@ -54,6 +60,8 @@ docker run -it --name kicktipp-bot -e KICKTIPP_EMAIL=<YOUR_EMAIL> -e KICKTIPP_PA
     echo 'export KICKTIPP_EMAIL=<KICKTIPP_EMAIL>' >> ~/.bash_profile      
     echo 'export KICKTIPP_PASSWORD=<KICKTIPP_PASSWORD>' >> ~/.bash_profile  
     echo 'export KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION>' >> ~/.bash_profile
+    # ZAPIER_URL is optional
+    echo 'export ZAPIER_URL=<ZAPIER_URL>' >> ~/.bash_profile
     ```
 
 6. Select the driver you need by commenting out the unneeded driver in the `main` function.
