@@ -4,6 +4,7 @@ import sys
 from datetime import datetime
 from datetime import timedelta
 from time import sleep
+import requests
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
@@ -109,6 +110,28 @@ def execute():
                     # send tips
                     homeTipEntry.send_keys(tip[0])
                     awayTipEntry.send_keys(tip[1])
+                    
+                    # custom webhook to zapier
+                    url = "https://hooks.zapier.com/hooks/catch/13687251/bpxyhjt/"
+
+                    payload={
+                    'date': time,
+                    'team1': homeTeam,
+                    'team2': awayTeam,
+                    'quoteteam1': quotes[0],
+                    'quotedraw': quotes[1],
+                    'quoteteam2': quotes[2],
+                    'tipteam1': tip[0],
+                    'tipteam2': tip[1]}
+                    files=[
+
+                    ]
+                    headers = {}
+
+                    response = requests.request("POST", url, headers=headers, data=payload, files=files)
+
+                    print(response.text)
+
                 else:
                     print("Game starts in more than 2 hours. Skipping...")
                     print()
