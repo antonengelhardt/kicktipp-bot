@@ -17,7 +17,7 @@ brew install docker
 docker pull antonengelhardt/kicktipp-bot
 
 # Run Container and set your env variables
-docker run -it --name kicktipp-bot -e KICKTIPP_EMAIL=<YOUR_EMAIL> -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> antonengelhardt/kicktipp-bot
+docker run -it --name kicktipp-bot -e KICKTIPP_EMAIL=<YOUR_EMAIL> -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> -e ZAPIER_URL<URL> antonengelhardt/kicktipp-bot
 ```
 
 ## Zapier Integration
@@ -69,9 +69,9 @@ If you want to receive a notification when the script tips for a match, you can 
 7. Execute the script
 
     ```bash
-    python3 main.py local # with GUI
+    python3 main.py local withZapier # with GUI and Zapier
     # or
-    python3 main.py headless # without GUI
+    python3 main.py headless # without GUI and Zapier
     ```
 
 ## Setup when running with Docker
@@ -95,13 +95,13 @@ If you want to receive a notification when the script tips for a match, you can 
 5. Run the container in the foreground
 
     ```bash
-    docker run -it --name kicktipp-bot -e KICKTIPP_EMAIL=<YOUR_EMAIL> -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> antonengelhardt/kicktipp-bot
+    docker run -it --name kicktipp-bot -e KICKTIPP_EMAIL=<YOUR_EMAIL> -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> -e ZAPIER_URL<URL> antonengelhardt/kicktipp-bot
     ```
 
 6. Run the container in the background
 
     ```bash
-    docker run -d --name kicktipp-bot -e KICKTIPP_EMAIL=<YOUR_EMAIL> -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> antonengelhardt/kicktipp-bot
+    docker run -d --name kicktipp-bot -e KICKTIPP_EMAIL=<YOUR_EMAIL> -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> -e ZAPIER_URL<URL> antonengelhardt/kicktipp-bot
     ```
 
 ### Check logs

@@ -113,25 +113,28 @@ def execute():
                     awayTipEntry.send_keys(tip[1])
 
                     # custom webhook to zapier
-                    # comment this out if you don't want to use it
-                    url = ZAPIER_URL
+                    try:
+                        if sys.argv[2] == 'withZapier':
+                            url = ZAPIER_URL
 
-                    payload = {
-                        'date': time,
-                        'team1': homeTeam,
-                        'team2': awayTeam,
-                        'quoteteam1': quotes[0],
-                        'quotedraw': quotes[1],
-                        'quoteteam2': quotes[2],
-                        'tipteam1': tip[0],
-                        'tipteam2': tip[1]}
-                    files = [
+                            payload = {
+                                'date': time,
+                                'team1': homeTeam,
+                                'team2': awayTeam,
+                                'quoteteam1': quotes[0],
+                                'quotedraw': quotes[1],
+                                'quoteteam2': quotes[2],
+                                'tipteam1': tip[0],
+                                'tipteam2': tip[1]}
+                            files = [
 
-                    ]
-                    headers = {}
+                            ]
+                            headers = {}
 
-                    response = requests.request(
-                        "POST", url, headers=headers, data=payload, files=files)
+                            response = requests.request(
+                                "POST", url, headers=headers, data=payload, files=files)
+                    except IndexError:
+                        pass
 
                 else:
                     print("Game starts in more than 2 hours. Skipping...")
