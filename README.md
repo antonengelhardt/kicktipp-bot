@@ -64,9 +64,7 @@ If you want to receive a notification when the script tips for a match, you can 
     echo 'export ZAPIER_URL=<ZAPIER_URL>' >> ~/.bash_profile
     ```
 
-6. Select the driver you need by commenting out the unneeded driver in the `main` function.
-
-7. Execute the script
+6. Execute the script
 
     ```bash
     python3 main.py local withZapier # with GUI and Zapier
@@ -90,15 +88,13 @@ If you want to receive a notification when the script tips for a match, you can 
     docker build -t antonengelhardt/kicktipp-bot .
     ```
 
-4. Select the driver you need by commenting out the unneeded driver in the `main` function.
-
-5. Run the container in the foreground
+4. Run the container in the foreground
 
     ```bash
     docker run -it --name kicktipp-bot -e KICKTIPP_EMAIL=<YOUR_EMAIL> -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> -e ZAPIER_URL<URL> antonengelhardt/kicktipp-bot
     ```
 
-6. Run the container in the background
+5. Run the container in the background
 
     ```bash
     docker run -d --name kicktipp-bot -e KICKTIPP_EMAIL=<YOUR_EMAIL> -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> -e ZAPIER_URL<URL> antonengelhardt/kicktipp-bot
