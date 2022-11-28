@@ -91,13 +91,27 @@ If you want to receive a notification when the script tips for a match, you can 
 4. Run the container in the foreground
 
     ```bash
-    docker run -it --name kicktipp-bot -e KICKTIPP_EMAIL=<YOUR_EMAIL> -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> -e ZAPIER_URL<URL> antonengelhardt/kicktipp-bot
+    docker run \
+    -it \
+    --name kicktipp-bot \
+    -e KICKTIPP_EMAIL=<YOUR_EMAIL> \
+    -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> \
+    -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> \
+    -e ZAPIER_URL<URL> \
+    antonengelhardt/kicktipp-bot
     ```
 
 5. Run the container in the background
 
     ```bash
-    docker run -d --name kicktipp-bot -e KICKTIPP_EMAIL=<YOUR_EMAIL> -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> -e ZAPIER_URL<URL> antonengelhardt/kicktipp-bot
+    docker run \
+    -d \
+    --name kicktipp-bot \
+    -e KICKTIPP_EMAIL=<YOUR_EMAIL> \
+    -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> \
+    -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> \
+    -e ZAPIER_URL<URL> \
+    antonengelhardt/kicktipp-bot
     ```
 
 ### Check logs
