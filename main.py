@@ -71,11 +71,14 @@ def execute():
             # only calc tip and enter, when not entered already
             if homeTipEntry.get_attribute('value') == '' and awayTipEntry.get_attribute('value') == '':
 
-                # time of game
-                time = datetime.strptime(
-                    driver.find_element(
-                        by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[1]').get_property('innerHTML'),
-                    '%d.%m.%y %H:%M')
+                try:
+                    # time of game
+                    time = datetime.strptime(
+                        driver.find_element(
+                            by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[1]').get_property('innerHTML'),
+                        '%d.%m.%y %H:%M')
+                except ValueError:
+                    pass
 
                 # get Team names
                 homeTeam = driver.find_element(
