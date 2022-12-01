@@ -30,7 +30,7 @@ def execute():
             driver = webdriver.Chrome(
                 options=set_chrome_options())  # for docker
         elif sys.argv[1] == 'local':
-            driver = webdriver.Chrome()  # for local
+            driver = webdriver.Chrome(CHROMEDRIVER_PATH)  # for local
     except IndexError:
         print('Debug Mode\n')
         driver = webdriver.Chrome()  # debug
