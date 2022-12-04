@@ -54,6 +54,11 @@ jobs:
     steps:
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
+        env:
+           KICKTIPP_EMAIL: ${{ secrets.KICKTIPP_EMAIL }}
+           KICKTIPP_PASSWORD: ${{ secrets.KICKTIPP_PASSWORD }}
+           KICKTIPP_NAME_OF_COMPETITION: ${{ secrets.KICKTIPP_NAME_OF_COMPETITION }}
+           ZAPIER_URL: ${{ secrets.ZAPIER_URL }}
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
@@ -61,10 +66,6 @@ jobs:
           port: ${{ secrets.PORT }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            export KICKTIPP_EMAIL=$KICKTIPP_EMAIL
-            export KICKTIPP_PASSWORD=$KICKTIPP_PASSWORD
-            export KICKTIPP_NAME_OF_COMPETITION=$KICKTIPP_NAME_OF_COMPETITION
-            export ZAPIER_URL=$ZAPIER_URL
             docker pull antonengelhardt/kicktipp-bot:latest
             docker stop kicktipp-bot
             docker rm kicktipp-bot
