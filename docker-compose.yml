@@ -9,4 +9,4 @@ services:
       - KICKTIPP_EMAIL=
       - KICKTIPP_PASSWORD=
       - KICKTIPP_NAME_OF_COMPETITION=buli22-23chefs
-      - DAY_OF_EXECUTION=3
+      - ZAPIER_URL=
