@@ -36,3 +36,22 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: antonengelhardt/kicktipp-bot:latest
+
+  deploy:
+    name: Deploy to Server
+    runs-on: ubuntu-latest
+    needs: [build, push]
+    steps:
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.PORT }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          script: |
+            docker pull antonengelhardt/kicktipp-bot:latest
+            docker stop kicktipp-bot
+            docker rm kicktipp-bot
+            docker run -d --name kicktipp-bot -e KICKTIPP_EMAIL=$KICKTIPP_EMAIL -e KICKTIPP_PASSWORD=$KICKTIPP_PASSWORD -e KICKTIPP_NAME_OF_COMPETITION=$KICKTIPP_NAME_OF_COMPETITION -e ZAPIER_URL=$ZAPIER_URL K antonengelhardt/kicktipp-bot:latest
