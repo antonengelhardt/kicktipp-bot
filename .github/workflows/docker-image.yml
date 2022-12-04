@@ -65,6 +65,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
           passphrase: ${{ secrets.PASSPHRASE }}
+          envs: KICKTIPP_EMAIL,KICKTIPP_PASSWORD,KICKTIPP_NAME_OF_COMPETITION,ZAPIER_URL
           script: |
             docker pull antonengelhardt/kicktipp-bot:latest
             docker stop kicktipp-bot
