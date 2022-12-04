@@ -70,7 +70,7 @@ jobs:
             docker pull antonengelhardt/kicktipp-bot:latest
             docker stop kicktipp-bot
             docker rm kicktipp-bot
-            docker run -d --name kicktipp-bot -e KICKTIPP_EMAIL=$KICKTIPP_EMAIL -e KICKTIPP_PASSWORD=$KICKTIPP_PASSWORD -e KICKTIPP_NAME_OF_COMPETITION=$KICKTIPP_NAME_OF_COMPETITION -e ZAPIER_URL=$ZAPIER_URL antonengelhardt/kicktipp-bot:latest
+            docker run --name kicktipp-bot -e KICKTIPP_EMAIL=$KICKTIPP_EMAIL -e KICKTIPP_PASSWORD=$KICKTIPP_PASSWORD -e KICKTIPP_NAME_OF_COMPETITION=$KICKTIPP_NAME_OF_COMPETITION -e ZAPIER_URL=$ZAPIER_URL antonengelhardt/kicktipp-bot:latest
 
   # notify:
 
