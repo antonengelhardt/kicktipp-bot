@@ -17,7 +17,14 @@ brew install docker
 docker pull antonengelhardt/kicktipp-bot
 
 # Run Container and set your env variables
-docker run -it --name kicktipp-bot -e KICKTIPP_EMAIL=<YOUR_EMAIL> -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> -e ZAPIER_URL<URL> antonengelhardt/kicktipp-bot
+docker run \
+-it \
+--name kicktipp-bot \
+-e KICKTIPP_EMAIL=<YOUR_EMAIL> \
+-e KICKTIPP_PASSWORD=<YOUR_PASSWORD> \
+-e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> \
+-e ZAPIER_URL<URL> \
+antonengelhardt/kicktipp-bot
 ```
 
 ## Zapier Integration
@@ -42,7 +49,7 @@ If you want to receive a notification when the script tips for a match, you can 
 
     It is recommended to place the executable in the same directory as the script or into the Applications folder.
 
-5. Set the constants `EMAIL`, `PASSWORD` and `NAME_OF_COMPETITON` as environment variables to your Kicktipp credentials to the day on which the script should be executed. 0 corresponds to Sunday and 6 to Saturday. It is recommended to set it to 3 (Wednesday) or 4 (Thursday).
+5. Set the constants `EMAIL`, `PASSWORD`, `NAME_OF_COMPETITON` and `ZAPIER_URL` as environment variables to your Kicktipp credentials to the day on which the script should be executed. 0 corresponds to Sunday and 6 to Saturday. It is recommended to set it to 3 (Wednesday) or 4 (Thursday).
 
     For zsh:
 
@@ -62,6 +69,12 @@ If you want to receive a notification when the script tips for a match, you can 
     echo 'export KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION>' >> ~/.bash_profile
     # ZAPIER_URL is optional
     echo 'export ZAPIER_URL=<ZAPIER_URL>' >> ~/.bash_profile
+    ```
+
+    You may also source the `setup.sh`-script:
+
+    ```bash
+    source setup.sh
     ```
 
 6. Execute the script
