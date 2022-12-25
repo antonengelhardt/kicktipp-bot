@@ -31,6 +31,19 @@ antonengelhardt/kicktipp-bot
 
 If you want to receive a notification when the script tips for a match, you can use the Zapier integration. Please create a Zapier Account and set up the following Trigger: Custom Webhook. Please also make sure you set the ENV Variable `ZAPIER_URL` to the URL of your custom webhook. Then you can set up actions like sending an email or a push notification.
 
+## Make commands
+
+This project uses `make` to simplify the execution of commands. The following commands are available:
+
+- `make all` - run `docker-build` and `docker-push`
+- `make local-run` - Runs the script locally with GUI and without Zapier
+- `make local-run-with-zapier` - Runs the script locally with GUI and with Zapier
+- `make docker-build` - Builds the Docker image
+- `make docker-run` - Runs the Docker image
+- `make docker-build-and-push` - Builds and pushes the Docker image to Docker Hub
+- `make docker-reset` - Stops and removes the Docker container
+- `make docker-all` - Runs all Docker commands
+
 ## Setup when running without Docker
 
 1. Clone the repository
