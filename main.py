@@ -62,6 +62,12 @@ def execute():
     # iterate over rows of the form
     for i in range(1, count + 1):
         try:
+             # get Team names
+            homeTeam = driver.find_element(
+                by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[2]').get_attribute('innerHTML')
+            awayTeam = driver.find_element(
+                by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[3]').get_attribute('innerHTML')
+            
             # find entry, enter if empty
             homeTipEntry = driver.find_element(by=By.XPATH,
                                                value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[4]/input[2]')
@@ -80,11 +86,6 @@ def execute():
                 except ValueError:
                     pass
 
-                # get Team names
-                homeTeam = driver.find_element(
-                    by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[2]').get_attribute('innerHTML')
-                awayTeam = driver.find_element(
-                    by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[3]').get_attribute('innerHTML')
 
                 # find quotes
                 quotes = driver.find_element(
@@ -142,6 +143,12 @@ def execute():
                 else:
                     print("Game starts in more than 2 hours. Skipping...")
                     print()
+            else:
+                # print out the tipped game
+                print(homeTeam + " - " + awayTeam)
+                
+                print("Game already tipped! Tip: " + homeTipEntry.get_attribute('value') + " - " + awayTipEntry.get_attribute('value'))
+                print()
 
         except NoSuchElementException:
             continue
