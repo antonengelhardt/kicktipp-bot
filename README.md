@@ -62,7 +62,7 @@ This project uses `make` to simplify the execution of commands. The following co
 
     It is recommended to place the executable in the same directory as the script or into the Applications folder.
 
-5. Set the constants `EMAIL`, `PASSWORD`, `NAME_OF_COMPETITON` and `ZAPIER_URL` as environment variables to your Kicktipp credentials to the day on which the script should be executed. 0 corresponds to Sunday and 6 to Saturday. It is recommended to set it to 3 (Wednesday) or 4 (Thursday).
+5. Set the constants `EMAIL`, `PASSWORD`, `NAME_OF_COMPETITON` and `ZAPIER_URL` as environment variables to your Kicktipp credentials to the day on which the script should be executed. 
 
     For zsh:
 
