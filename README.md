@@ -7,10 +7,10 @@ This script can automatically enter tips into Kicktipp based on the quotes of th
 Execute the commands below in the `Terminal`-Program:
 
 ```bash
-# Install brew
+# Install brew if not already
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Install Docker
+# Install Docker if not already
 brew install docker
 
 # Get Image
