@@ -8,5 +8,5 @@ services:
     environment:
       - KICKTIPP_EMAIL=
       - KICKTIPP_PASSWORD=
-      - KICKTIPP_NAME_OF_COMPETITION=buli22-23chefs
+      - KICKTIPP_NAME_OF_COMPETITION=
       - ZAPIER_URL=
