@@ -23,7 +23,7 @@ docker run \
 -e KICKTIPP_EMAIL=<YOUR_EMAIL> \
 -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> \
 -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> \
--e ZAPIER_URL<URL> \
+-e ZAPIER_URL=<URL> \
 antonengelhardt/kicktipp-bot
 ```
 
