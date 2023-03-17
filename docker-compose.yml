@@ -2,11 +2,13 @@ version: '3.7'
 
 services:
   bot:
-    image: antonengelhardt/kicktipp-bot:latest
+    # image: antonengelhardt/kicktipp-bot:latest
+    build: ./
     container_name: kicktipp-bot
     restart: always
     environment:
-      - KICKTIPP_EMAIL=
-      - KICKTIPP_PASSWORD=
-      - KICKTIPP_NAME_OF_COMPETITION=
-      - ZAPIER_URL=
+      - KICKTIPP_EMAIL=${KICKTIPP_EMAIL}
+      - KICKTIPP_PASSWORD=${KICKTIPP_PASSWORD}
+      - KICKTIPP_NAME_OF_COMPETITION=${KICKTIPP_NAME_OF_COMPETITION}
+      - ZAPIER_URL=${ZAPIER_URL}
+      - HOURS_UNTIL_GAME=${HOURS_UNTIL_GAME}
