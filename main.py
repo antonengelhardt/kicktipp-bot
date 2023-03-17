@@ -20,6 +20,7 @@ PASSWORD = os.getenv("KICKTIPP_PASSWORD")
 NAME_OF_COMPETITION = os.getenv("KICKTIPP_NAME_OF_COMPETITION")
 CHROMEDRIVER_PATH = "/Applications/chromedriver"
 ZAPIER_URL = os.getenv("ZAPIER_URL")
+HOURS_UNTIL_GAME = os.getenv("HOURS_UNTIL_GAME")
 
 
 def execute():
@@ -67,7 +68,7 @@ def execute():
                 by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[2]').get_attribute('innerHTML')
             awayTeam = driver.find_element(
                 by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[3]').get_attribute('innerHTML')
-            
+
             # find entry, enter if empty
             homeTipEntry = driver.find_element(by=By.XPATH,
                                                value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[4]/input[2]')
@@ -99,9 +100,9 @@ def execute():
                 timeUntilGame = time - datetime.now()
                 print("Time until game: " + str(timeUntilGame))
 
-                # only tip if game starts in less than 2 hours
-                if timeUntilGame < timedelta(hours=2):
-                    print("Game starts in less than 2 hours. Tipping now...")
+                # only tip if game starts in less than given hours (HOURS_UNTIL_GAME)
+                if timeUntilGame < timedelta(hours=int(HOURS_UNTIL_GAME)):
+                    print("Game starts in less than " + HOURS_UNTIL_GAME + " hours. Tipping now...")
 
                     # print quotes
                     print("Quotes:" + str(quotes))
@@ -120,33 +121,35 @@ def execute():
                     try:
                         if sys.argv[2] == 'withZapier':
                             url = ZAPIER_URL
+                            if url:
+                                payload = {
+                                    'date': time,
+                                    'team1': homeTeam,
+                                    'team2': awayTeam,
+                                    'quoteteam1': quotes[0],
+                                    'quotedraw': quotes[1],
+                                    'quoteteam2': quotes[2],
+                                    'tipteam1': tip[0],
+                                    'tipteam2': tip[1]}
+                                files = [
 
-                            payload = {
-                                'date': time,
-                                'team1': homeTeam,
-                                'team2': awayTeam,
-                                'quoteteam1': quotes[0],
-                                'quotedraw': quotes[1],
-                                'quoteteam2': quotes[2],
-                                'tipteam1': tip[0],
-                                'tipteam2': tip[1]}
-                            files = [
+                                ]
+                                headers = {}
 
-                            ]
-                            headers = {}
-
-                            response = requests.request(
-                                "POST", url, headers=headers, data=payload, files=files)
+                                response = requests.request(
+                                    "POST", url, headers=headers, data=payload, files=files)
+                            else:
+                                print("No Zapier URL given")
                     except IndexError:
                         pass
 
                 else:
-                    print("Game starts in more than 2 hours. Skipping...")
+                    print("Game starts in more than " + HOURS_UNTIL_GAME + " hours. Skipping...")
                     print()
             else:
                 # print out the tipped game
                 print(homeTeam + " - " + awayTeam)
-                
+
                 print("Game already tipped! Tip: " + homeTipEntry.get_attribute('value') + " - " + awayTipEntry.get_attribute('value'))
                 print()
 
