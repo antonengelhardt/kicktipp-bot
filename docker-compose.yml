@@ -1,9 +1,10 @@
-version: '3.7'
+version: '3'
 
 services:
   bot:
-    # image: antonengelhardt/kicktipp-bot:latest
-    build: ./
+    build:
+      dockerfile: Dockerfile
+      context: ./
     container_name: kicktipp-bot
     restart: always
     environment:
@@ -12,3 +13,4 @@ services:
       - KICKTIPP_NAME_OF_COMPETITION=${KICKTIPP_NAME_OF_COMPETITION}
       - ZAPIER_URL=${ZAPIER_URL}
       - HOURS_UNTIL_GAME=${HOURS_UNTIL_GAME}
+
