@@ -2,11 +2,12 @@ version: '3.7'
 
 services:
   bot:
-    image: antonengelhardt/kicktipp-bot:latest
+    platform: linux/amd64
+    image: antonengelhardt/kicktipp-bot:amd64
     container_name: kicktipp-bot
-    restart: always
+    restart: unless-stoped
     environment:
-      - KICKTIPP_EMAIL=
-      - KICKTIPP_PASSWORD=
-      - KICKTIPP_NAME_OF_COMPETITION=buli22-23chefs
-      - ZAPIER_URL=
+      - KICKTIPP_EMAIL=${KICKTIPP_EMAIL}
+      - KICKTIPP_PASSWORD=${KICKTIPP_PASSWORD}
+      - KICKTIPP_NAME_OF_COMPETITION=${KICKTIPP_NAME_OF_COMPETITION}
+      - ZAPIER_URL=${ZAPIER_URL}

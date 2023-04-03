@@ -1,12 +1,13 @@
-IMAGE_NAME = antonengelhardt/kicktipp-bot
+IMAGE_NAME = antonengelhardt/kicktipp-bot:arm64
+# IMAGE_NAME = antonengelhardt/kicktipp-bot:amd64
 
-all: docker-build docker-push 
+all: docker-build docker-push
 
 local-run:
-	python3 main.py local
+	python main.py local
 
 local-run-with-zapier:
-	python3 main.py local withZapier
+	python main.py local withZapier
 
 docker-build:
 	docker build -t $(IMAGE_NAME) .
