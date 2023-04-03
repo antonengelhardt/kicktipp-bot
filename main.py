@@ -12,15 +12,12 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
 # Constants
-
-BASE_URL = "https://www.kicktipp.de"
 LOGIN_URL = "https://www.kicktipp.de/info/profil/login"
 EMAIL = os.getenv("KICKTIPP_EMAIL")
 PASSWORD = os.getenv("KICKTIPP_PASSWORD")
 NAME_OF_COMPETITION = os.getenv("KICKTIPP_NAME_OF_COMPETITION")
-CHROMEDRIVER_PATH = "/Applications/chromedriver"
 ZAPIER_URL = os.getenv("ZAPIER_URL")
-
+CHROMEDRIVER_PATH = "/Applications/chromedriver"
 
 def execute():
 
@@ -67,7 +64,7 @@ def execute():
                 by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[2]').get_attribute('innerHTML')
             awayTeam = driver.find_element(
                 by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[3]').get_attribute('innerHTML')
-            
+
             # find entry, enter if empty
             homeTipEntry = driver.find_element(by=By.XPATH,
                                                value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[4]/input[2]')
@@ -118,8 +115,7 @@ def execute():
 
                     # custom webhook to zapier
                     try:
-                        if sys.argv[2] == 'withZapier':
-                            url = ZAPIER_URL
+                        if ZAPIER_URL != None:
 
                             payload = {
                                 'date': time,
@@ -130,13 +126,10 @@ def execute():
                                 'quoteteam2': quotes[2],
                                 'tipteam1': tip[0],
                                 'tipteam2': tip[1]}
-                            files = [
-
-                            ]
+                            files = []
                             headers = {}
 
-                            response = requests.request(
-                                "POST", url, headers=headers, data=payload, files=files)
+                            requests.request("POST", ZAPIER_URL, headers=headers, data=payload, files=files)
                     except IndexError:
                         pass
 
@@ -146,7 +139,7 @@ def execute():
             else:
                 # print out the tipped game
                 print(homeTeam + " - " + awayTeam)
-                
+
                 print("Game already tipped! Tip: " + homeTipEntry.get_attribute('value') + " - " + awayTipEntry.get_attribute('value'))
                 print()
 
@@ -214,8 +207,26 @@ def set_chrome_options() -> None:
     chrome_prefs["profile.default_content_settings"] = {"images": 2}
     return chrome_options
 
+def checkForEnvVars():
+    if os.getenv("KICKTIPP_EMAIL") is None:
+        print(os.environ.get("KICKTIPP_EMAIL"))
+        print("Please set the environment variable KICKTIPP_EMAIL")
+        exit(1)
+    if os.getenv("KICKTIPP_PASSWORD") is None:
+        print("Please set the environment variable KICKTIPP_PASSWORD")
+        exit(1)
+    if os.getenv("KICKTIPP_NAME_OF_COMPETITION") is None:
+        print("Please set the environment variable KICKTIPP_NAME_OF_COMPETITION")
+        exit(1)
+    if os.getenv("ZAPIER_URL") is None:
+        print("Warning: Zapier URL not set. No webhook will be sent.")
+
+    print("All environment variables are set. Starting the script...")
 
 if __name__ == '__main__':
+
+    checkForEnvVars()
+
     while True:
         now = datetime.now().strftime('%d.%m.%y %H:%M')
         print(now + ": The script will execute now!\n")
