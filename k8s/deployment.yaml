@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bot
+spec:
+  replicas: 1
+  selector: {}
+  strategy:
+    type: RollingUpdate
+  template:
+    spec:
+      containers:
+        - env:
+            - name: KICKTIPP_EMAIL
+              value: example@example.com
+            - name: KICKTIPP_PASSWORD
+              value: examplepassword
+            - name: KICKTIPP_NAME_OF_COMPETITION
+              value: bundesliga123
+            - name: ZAPIER_URL
+              value: https://hooks.zapier.com/hooks/catch/1234567890/abcdefghij/
+          image: antonengelhardt/kicktipp-bot:arm64
+          # image: antonengelhardt/kicktipp-bot:amd64
+          name: kicktipp-bot
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1024Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+      restartPolicy: Always
