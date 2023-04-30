@@ -219,7 +219,10 @@ if __name__ == '__main__':
     while True:
         now = datetime.now().strftime('%d.%m.%y %H:%M')
         print(now + ": The script will execute now!\n")
-        execute()
+        try:
+            execute()
+        except Exception as e:
+            print("An error occured: " + str(e) + "\n")
         now = datetime.now().strftime('%d.%m.%y %H:%M')
         print(now + ": The script has finished. Sleeping for 1 hour...\n")
         sleep(60*60)

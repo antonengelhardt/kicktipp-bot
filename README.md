@@ -14,7 +14,9 @@ Execute the commands below in the `Terminal`-Program:
 brew install docker
 
 # Get Image
-docker pull antonengelhardt/kicktipp-bot
+docker pull antonengelhardt/kicktipp-bot:arm64
+# or
+docker pull antonengelhardt/kicktipp-bot:amd64
 
 # Run Container and set your env variables
 docker run \
@@ -23,8 +25,10 @@ docker run \
 -e KICKTIPP_EMAIL=<YOUR_EMAIL> \
 -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> \
 -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> \
--e ZAPIER_URL=<URL> \
-antonengelhardt/kicktipp-bot
+-e ZAPIER_URL<URL> \
+antonengelhardt/kicktipp-bot:arm64
+# or
+antonengelhardt/kicktipp-bot:amd64
 ```
 
 ## Zapier Integration
@@ -62,13 +66,13 @@ This project uses `make` to simplify the execution of commands. The following co
 
     It is recommended to place the executable in the same directory as the script or into the Applications folder.
 
-5. Set the constants `EMAIL`, `PASSWORD`, `NAME_OF_COMPETITON` and `ZAPIER_URL` as environment variables to your Kicktipp credentials to the day on which the script should be executed. 
+5. Set the constants `EMAIL`, `PASSWORD`, `NAME_OF_COMPETITON` and `ZAPIER_URL` as environment variables to your Kicktipp credentials to the day on which the script should be executed.
 
     For zsh:
 
     ```bash
-    echo 'export KICKTIPP_EMAIL=<KICKTIPP_EMAIL>' >> ~/.zshenv  
-    echo 'export KICKTIPP_PASSWORD=<KICKTIPP_PASSWORD>' >> ~/.zshenv   
+    echo 'export KICKTIPP_EMAIL=<KICKTIPP_EMAIL>' >> ~/.zshenv
+    echo 'export KICKTIPP_PASSWORD=<KICKTIPP_PASSWORD>' >> ~/.zshenv
     echo 'export KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION>' >> ~/.zshenv
     # ZAPIER_URL is optional
     echo 'export ZAPIER_URL=<ZAPIER_URL>' >> ~/.zshenv
@@ -77,8 +81,8 @@ This project uses `make` to simplify the execution of commands. The following co
     For bash:
 
     ```bash
-    echo 'export KICKTIPP_EMAIL=<KICKTIPP_EMAIL>' >> ~/.bash_profile      
-    echo 'export KICKTIPP_PASSWORD=<KICKTIPP_PASSWORD>' >> ~/.bash_profile  
+    echo 'export KICKTIPP_EMAIL=<KICKTIPP_EMAIL>' >> ~/.bash_profile
+    echo 'export KICKTIPP_PASSWORD=<KICKTIPP_PASSWORD>' >> ~/.bash_profile
     echo 'export KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION>' >> ~/.bash_profile
     # ZAPIER_URL is optional
     echo 'export ZAPIER_URL=<ZAPIER_URL>' >> ~/.bash_profile
@@ -93,9 +97,9 @@ This project uses `make` to simplify the execution of commands. The following co
 6. Execute the script
 
     ```bash
-    python3 main.py local withZapier # with GUI and Zapier
+    python main.py local withZapier # with GUI and Zapier
     # or
-    python3 main.py headless # without GUI and Zapier
+    python main.py headless # without GUI and Zapier
     ```
 
 ## Setup when running with Docker
@@ -107,11 +111,12 @@ This project uses `make` to simplify the execution of commands. The following co
 3. Pull the image from Docker Hub or build it yourself
 
     ```bash
-    docker pull antonengelhardt/kicktipp-bot
+    docker pull antonengelhardt/kicktipp-bot:arm64 # for Apple Silicon
+    docker pull antonengelhardt/kicktipp-bot:amd64 # for Intel
 
-    # or 
+    # or
 
-    docker build -t antonengelhardt/kicktipp-bot .
+    docker build -t antonengelhardt/kicktipp-bot:tag .
     ```
 
 4. Run the container in the foreground
@@ -124,7 +129,7 @@ This project uses `make` to simplify the execution of commands. The following co
     -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> \
     -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> \
     -e ZAPIER_URL<URL> \
-    antonengelhardt/kicktipp-bot
+    antonengelhardt/kicktipp-bot:tag
     ```
 
 5. Run the container in the background
@@ -137,7 +142,7 @@ This project uses `make` to simplify the execution of commands. The following co
     -e KICKTIPP_PASSWORD=<YOUR_PASSWORD> \
     -e KICKTIPP_NAME_OF_COMPETITION=<NAME_OF_COMPETITION> \
     -e ZAPIER_URL<URL> \
-    antonengelhardt/kicktipp-bot
+    antonengelhardt/kicktipp-bot:tag
     ```
 
 ### Check logs
