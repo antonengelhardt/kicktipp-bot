@@ -1,4 +1,4 @@
-FROM python:3.8-buster
+FROM python:3.8.18-slim
 
 # update apk repo
 RUN echo "http://dl-4.alpinelinux.org/alpine/v3.14/main" >> /etc/apk/repositories && \
