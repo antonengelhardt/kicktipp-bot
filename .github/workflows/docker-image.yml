@@ -2,7 +2,8 @@ name: CI/CD
 
 on:
   push:
-    branches: [ "main", "reviving-this-project" ]
+    branches:
+      - main
 
 jobs:
   push:
@@ -59,14 +60,15 @@ jobs:
           port: ${{ secrets.PORT }}
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
-            docker pull antonengelhardt/kicktipp-bot:amd64
+            cd ~/kicktipp-bot
+
+            echo "KICKTIPP_EMAIL=${{ secrets.KICKTIPP_EMAIL }}" >> .env
+            echo "KICKTIPP_PASSWORD=${{ secrets.KICKTIPP_PASSWORD }}" >> .env
+            echo "KICKTIPP_NAME_OF_COMPETITION=${{ secrets.KICKTIPP_NAME_OF_COMPETITION }}" >> .env
+            echo "KICKTIPP_HOURS_UNTIL_GAME=10" >> .env
+            echo "ZAPIER_URL=${{ secrets.ZAPIER_URL }}" >> .env
+
+            docker pull ghcr.io/antonengelhardt/kicktipp-bot:amd64
             docker stop kicktipp-bot || true
             docker rm kicktipp-bot || true
-
-            echo "KICKTIPP_EMAIL=${{ secrets.KICKTIPP_EMAIL }}"
-            echo "KICKTIPP_PASSWORD=${{ secrets.KICKTIPP_PASSWORD }}"
-            echo "KICKTIPP_NAME_OF_COMPETITION=${{ secrets.KICKTIPP_NAME_OF_COMPETITION }}"
-            echo "KICKTIPP_HOURS_UNTIL_GAME=10"
-            echo "ZAPIER_URL=${{ secrets.ZAPIER_URL }}"
-
-            docker run -d --restart unless-stopped --name kicktipp-bot --env-file .env ghcr.io/antonengelhardt/kicktipp-bot:amd64
+            docker run -itd --restart unless-stopped --name kicktipp-bot --env-file .env ghcr.io/antonengelhardt/kicktipp-bot:amd64
