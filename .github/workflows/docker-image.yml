@@ -2,7 +2,7 @@ name: CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "reviving-this-project" ]
 
 jobs:
   push:
@@ -52,28 +52,21 @@ jobs:
     steps:
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
-        env:
-           KICKTIPP_EMAIL: ${{ secrets.KICKTIPP_EMAIL }}
-           KICKTIPP_PASSWORD: ${{ secrets.KICKTIPP_PASSWORD }}
-           KICKTIPP_NAME_OF_COMPETITION: ${{ secrets.KICKTIPP_NAME_OF_COMPETITION }}
-           KICKTIPP_HOURS_UNTIL_GAME: 10
-           ZAPIER_URL: ${{ secrets.ZAPIER_URL }}
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
           passphrase: ${{ secrets.PASSPHRASE }}
-          envs: KICKTIPP_EMAIL,KICKTIPP_PASSWORD,KICKTIPP_NAME_OF_COMPETITION,ZAPIER_URL
           script: |
             docker pull antonengelhardt/kicktipp-bot:amd64
             docker stop kicktipp-bot || true
             docker rm kicktipp-bot || true
 
-            echo $KICKTIPP_EMAIL >> .env
-            echo $KICKTIPP_PASSWORD >> .env
-            echo $KICKTIPP_NAME_OF_COMPETITION >> .env
-            echo $ZAPIER_URL >> .env
-            echo $KICKTIPP_HOURS_UNTIL_GAME >> .env
+            echo "KICKTIPP_EMAIL=${{ secrets.KICKTIPP_EMAIL }}"
+            echo "KICKTIPP_PASSWORD=${{ secrets.KICKTIPP_PASSWORD }}"
+            echo "KICKTIPP_NAME_OF_COMPETITION=${{ secrets.KICKTIPP_NAME_OF_COMPETITION }}"
+            echo "KICKTIPP_HOURS_UNTIL_GAME=10"
+            echo "ZAPIER_URL=${{ secrets.ZAPIER_URL }}"
 
             docker run -d --restart unless-stopped --name kicktipp-bot --env-file .env ghcr.io/antonengelhardt/kicktipp-bot:amd64
