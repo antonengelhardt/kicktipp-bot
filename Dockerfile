@@ -4,7 +4,6 @@ FROM python:3.12.4-alpine
 RUN apk update
 RUN apk add chromium
 RUN apk add chromium-chromedriver
-RUN apk add gcc build-base freetype-dev libpng-dev openblas-dev
 
 WORKDIR /app
 
