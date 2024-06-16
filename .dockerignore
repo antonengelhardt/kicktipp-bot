@@ -1,6 +1,10 @@
-.env
+# Ignore IDE files and Mac files
 .DS_Store
 .idea/
 *.iml
 
+# Ignore the .env file in the root directory
+.env
+
+# Ignore Kubernetes secrets
 my-secrets.yaml

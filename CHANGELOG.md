@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - **(github)** Add pr and issue template
 - **(ci)** Rename main ci, add tests and release ci
 - **(notify)** Add ntfy support
+- **(k8s)** Kubernetes deployment files, ci for k8s
 
 ### 🐛 Bug Fixes
 
@@ -25,6 +26,7 @@ All notable changes to this project will be documented in this file.
 - **(ci)** Env in ci fixed
 - **(ci)** Cd before .env creation
 - **(cliff)** Bold scope
+- **(ci)** Rename test job
 
 ### 🚜 Refactor
 
