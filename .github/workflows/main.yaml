@@ -1,4 +1,4 @@
-name: CI/CD
+name: Push to Main
 
 on:
   push:
@@ -62,11 +62,15 @@ jobs:
           script: |
             cd ~/kicktipp-bot
 
+            rm -f .env
             echo "KICKTIPP_EMAIL=${{ secrets.KICKTIPP_EMAIL }}" >> .env
             echo "KICKTIPP_PASSWORD=${{ secrets.KICKTIPP_PASSWORD }}" >> .env
             echo "KICKTIPP_NAME_OF_COMPETITION=${{ secrets.KICKTIPP_NAME_OF_COMPETITION }}" >> .env
             echo "KICKTIPP_HOURS_UNTIL_GAME=10" >> .env
             echo "ZAPIER_URL=${{ secrets.ZAPIER_URL }}" >> .env
+            echo "NTFY_URL=${{ secrets.NTFY_URL }}" >> .env
+            echo "NTFY_USERNAME=${{ secrets.NTFY_USERNAME }}" >> .env
+            echo "NTFY_PASSWORD=${{ secrets.NTFY_PASSWORD }}" >> .env
 
             docker pull ghcr.io/antonengelhardt/kicktipp-bot:amd64
             docker stop kicktipp-bot || true
