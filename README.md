@@ -31,6 +31,7 @@ or deploy with Kubernetes.
 | `KICKTIPP_PASSWORD` | Your Kicktipp password | `password` | Yes |
 | `KICKTIPP_NAME_OF_COMPETITION` | The name of the competition you want to tip for | `mycoolfriendgroup` | Yes |
 | `KICKTIPP_HOURS_UNTIL_GAME` | The script will tip games which start in the next x hours | `24` | No |
+| `KICKTIPP_RUN_EVERY_X_MINUTES` | The script will run every x minutes | `60` | No |
 | `CHROMEDRIVER_PATH` | The path to the chromedriver binary | `/usr/bin/chromedriver` | No |
 | `ZAPIER_URL` | The URL of your Zapier Webhook | `https://hooks.zapier.com/hooks/catch/123456/abcdef/` | No |
 | `NTFY_URL` | The URL of your NTFY Webhook | `https://ntfy.your-domain.com` | No |
