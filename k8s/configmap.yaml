@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kicktipp-bot-config
+  namespace: kicktipp-bot
+data:
+  PYTHONUNBUFFERED: "1"
+  KICKTIPP_HOURS_UNTIL_GAME: "10"

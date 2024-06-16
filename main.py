@@ -1,5 +1,4 @@
 import os
-import random
 import sys
 from datetime import datetime
 from datetime import timedelta
@@ -11,29 +10,91 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
-# Constants
+from game import Game
 
-BASE_URL = "https://www.kicktipp.de"
-LOGIN_URL = "https://www.kicktipp.de/info/profil/login"
+# Constants
+BASE_URL = "https://www.kicktipp.de/"
+LOGIN_URL = "https://www.kicktipp.de/info/profil/login/"
 EMAIL = os.getenv("KICKTIPP_EMAIL")
 PASSWORD = os.getenv("KICKTIPP_PASSWORD")
 NAME_OF_COMPETITION = os.getenv("KICKTIPP_NAME_OF_COMPETITION")
-CHROMEDRIVER_PATH = "/Applications/chromedriver"
+CHROMEDRIVER_PATH = os.getenv("CHROMEDRIVER_PATH")
 ZAPIER_URL = os.getenv("ZAPIER_URL")
+TIME_UNTIL_GAME = os.getenv("KICKTIPP_HOURS_UNTIL_GAME") != None and timedelta(
+    hours=int(os.getenv("KICKTIPP_HOURS_UNTIL_GAME"))) or timedelta(hours=2)
+NTFY_URL = os.getenv("NTFY_URL")
+NTFY_USERNAME = os.getenv("NTFY_USERNAME")
+NTFY_PASSWORD = os.getenv("NTFY_PASSWORD")
 
 
-def execute():
+def tip_all_games():
 
     # create driver
+    driver = create_driver()
+
+    # login
+    login(driver)
+
+    # entry form
+    driver.get(F"https://www.kicktipp.de/{NAME_OF_COMPETITION}/tippabgabe")
+
+    # accept AGB
+    sleep(5)
+    accept_agbs(driver)
+
+    # get number of rows
+    games_count = len(driver.find_elements(
+        by=By.CLASS_NAME, value="datarow"))
+
+    # iterate over rows of the form
+    for i in range(1, games_count):
+        try:
+            tip_game(driver, i)
+
+        except NoSuchElementException:
+            # try to accept AGB again
+            accept_agbs(driver)
+
+            tip_game(driver, i)
+
+            # and then try next row
+            continue
+    sleep(0.1)
+
+    # submit all tips
+    driver.find_element(by=By.NAME, value="submitbutton").click()
+
     try:
-        if sys.argv[1] == 'headless':
+        if sys.argv[1] == '--local':
+            print("Sleeping for 20secs to see the result - Debug Mode\n")
+            sleep(20)
+    except IndexError:
+        pass
+
+    driver.quit()
+
+
+def create_driver():
+    if CHROMEDRIVER_PATH is not None:
+        print('Custom Chrome Driver Path\n')
+        driver = webdriver.Chrome(CHROMEDRIVER_PATH)  # for local
+
+    try:
+        if sys.argv[1] == '--headless':
+            print('Headless Mode\n')
             driver = webdriver.Chrome(
                 options=set_chrome_options())  # for docker
-        elif sys.argv[1] == 'local':
-            driver = webdriver.Chrome(CHROMEDRIVER_PATH)  # for local
+
     except IndexError:
         print('Debug Mode\n')
         driver = webdriver.Chrome()  # debug
+
+    return driver
+
+
+def login(driver):
+
+    print("Logging in...")
 
     # login
     driver.get(LOGIN_URL)
@@ -47,158 +108,140 @@ def execute():
     # send login
     driver.find_element(by=By.NAME, value="submitbutton").click()
 
-    # accept AGB
+    if driver.current_url == BASE_URL:
+        print("Logged in!\n")
+    else:
+        print("Login failed!\n")
+
+
+def tip_game(driver, i):
+
+    xpath_row = '//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']'
+
+    # time of game
+    time = datetime.strptime(
+        driver.find_element(
+            by=By.XPATH, value=xpath_row + '/td[1]').get_property('innerHTML'),
+        '%d.%m.%y %H:%M')
+
+    # get Team names
+    home_team = driver.find_element(
+        by=By.XPATH, value=xpath_row + '/td[2]').get_attribute('innerHTML')
+    away_team = driver.find_element(
+        by=By.XPATH, value=xpath_row + '/td[3]').get_attribute('innerHTML')
+
+    # print time and team names
+    print(home_team + " - " + away_team)
+    print("Time: " + str(time.strftime('%d.%m.%y %H:%M')))
+
+    # find entry fields. if not found, the game is over
+    try:
+        home_tip_entry = driver.find_element(by=By.XPATH,
+                                             value=xpath_row + '/td[4]/input[2]')
+        away_tip_entry = driver.find_element(by=By.XPATH,
+                                             value=xpath_row + '/td[4]/input[3]')
+    except NoSuchElementException:
+        # print out the tipped game
+        print("Game is over: " + driver.find_element(
+            by=By.XPATH, value=xpath_row + '/td[4]').get_attribute('innerHTML').replace(":", " - ") + "\n")
+        return
+
+    # only continue if the game is not tipped yet
+    if home_tip_entry.get_attribute('value') != "" and away_tip_entry.get_attribute('value') != "":
+        print("Game already tipped: " + driver.find_element(
+            by=By.XPATH, value=xpath_row + '/td[4]/input[2]').get_attribute('value') + " - " + driver.find_element(
+            by=By.XPATH, value=xpath_row + '/td[4]/input[3]').get_attribute('value') + "\n")
+        return
+
+    # time until start of game
+    time_until_game = time - datetime.now()
+    print("Time until game: " + str(time_until_game))
+
+    # only tip if game starts in less than defined time
+    if time_until_game > TIME_UNTIL_GAME:
+
+        print("Game starts in more than ", TIME_UNTIL_GAME, ". Skipping...\n")
+
+    else:
+        print("Game starts in less than ", TIME_UNTIL_GAME, ". Tipping...")
+
+        # find quotes
+        quotes_raw = driver.find_element(
+            by=By.XPATH, value=xpath_row + '/td[5]/a').get_property('innerHTML')
+
+        quotes_sanitized = quotes_raw.replace("Quote: ", "")
+        if quotes_sanitized.find("/"):
+            quotes = quotes_sanitized.split(" / ")
+        elif quotes_sanitized.find(" | "):
+            quotes = quotes_sanitized.split(" | ")
+        else:
+            print("Quotes not found")
+            return
+
+        # create game object
+        game = Game(home_team, away_team, quotes, time)
+
+        # print quotes
+        print("Quotes:" + str(quotes))
+
+        # calculate tips bases on quotes and print them
+        tip = game.calculate_tip(float(quotes[0]), float(quotes[2]))
+        print("Tip: " + str(tip), "\n")
+
+        # send tips
+        home_tip_entry.send_keys(tip[0])
+        away_tip_entry.send_keys(tip[1])
+
+        # custom webhook to zapier
+        send_zapier_webhook(time, home_team, away_team, quotes, tip)
+
+        # ntfy notification
+        send_ntfy_notification(time, home_team, away_team, quotes, tip)
+
+
+def send_zapier_webhook(time, home_team, away_team, quotes, tip):
+    if ZAPIER_URL is not None:
+        try:
+            payload = {
+                'date': time,
+                'team1': home_team,
+                'team2': away_team,
+                'quoteteam1': quotes[0],
+                'quotedraw': quotes[1],
+                'quoteteam2': quotes[2],
+                'tipteam1': tip[0],
+                'tipteam2': tip[1]}
+            files = []
+            headers = {}
+
+            requests.post(ZAPIER_URL, headers=headers,
+                          data=payload, files=files)
+        except IndexError:
+            pass
+
+
+def send_ntfy_notification(time, home_team, away_team, quotes, tip):
+    if NTFY_URL is not None and NTFY_USERNAME is not None and NTFY_PASSWORD is not None:
+        try:
+            data = f"Time: {time.strftime('%d.%m.%y %H:%M')}\nQuotes: {quotes}"
+
+            headers = {
+                "X-Title": f"{home_team} - {away_team} tipped {tip[0]}:{tip[1]}",
+            }
+
+            requests.post(NTFY_URL, auth=(
+                NTFY_USERNAME, NTFY_PASSWORD), data=data, headers=headers)
+
+        except IndexError:
+            pass
+
+
+def accept_agbs(driver):
     try:
         driver.find_element(
             by=By.XPATH, value='//*[@id="qc-cmp2-ui"]/div[2]/div/button[2]').click()
     except NoSuchElementException:
         pass
-
-    # entry form
-    driver.get(F"https://www.kicktipp.de/{NAME_OF_COMPETITION}/tippabgabe")
-
-    count = driver.find_elements(by=By.CLASS_NAME, value="datarow").__len__()
-
-    # iterate over rows of the form
-    for i in range(1, count + 1):
-        try:
-             # get Team names
-            homeTeam = driver.find_element(
-                by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[2]').get_attribute('innerHTML')
-            awayTeam = driver.find_element(
-                by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[3]').get_attribute('innerHTML')
-            
-            # find entry, enter if empty
-            homeTipEntry = driver.find_element(by=By.XPATH,
-                                               value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[4]/input[2]')
-            awayTipEntry = driver.find_element(by=By.XPATH,
-                                               value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[4]/input[3]')
-
-            # only calc tip and enter, when not entered already
-            if homeTipEntry.get_attribute('value') == '' and awayTipEntry.get_attribute('value') == '':
-
-                try:
-                    # time of game
-                    time = datetime.strptime(
-                        driver.find_element(
-                            by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[1]').get_property('innerHTML'),
-                        '%d.%m.%y %H:%M')
-                except ValueError:
-                    pass
-
-
-                # find quotes
-                quotes = driver.find_element(
-                    by=By.XPATH, value='//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']/td[5]/a').get_property('innerHTML').split(sep=" / ")
-
-                # print time and team names
-                print(homeTeam + " - " + awayTeam +
-                      "\nTime: " + str(time.strftime('%d.%m.%y %H:%M')))
-
-                # time until start of game
-                timeUntilGame = time - datetime.now()
-                print("Time until game: " + str(timeUntilGame))
-
-                # only tip if game starts in less than 2 hours
-                if timeUntilGame < timedelta(hours=2):
-                    print("Game starts in less than 2 hours. Tipping now...")
-
-                    # print quotes
-                    print("Quotes:" + str(quotes))
-
-                    # calculate tips bases on quotes and print them
-                    tip = calculate_tip(float(quotes[0]), float(
-                        quotes[1]), float(quotes[2]))
-                    print("Tip: " + str(tip))
-                    print()
-
-                    # send tips
-                    homeTipEntry.send_keys(tip[0])
-                    awayTipEntry.send_keys(tip[1])
-
-                    # custom webhook to zapier
-                    try:
-                        if sys.argv[2] == 'withZapier':
-                            url = ZAPIER_URL
-
-                            payload = {
-                                'date': time,
-                                'team1': homeTeam,
-                                'team2': awayTeam,
-                                'quoteteam1': quotes[0],
-                                'quotedraw': quotes[1],
-                                'quoteteam2': quotes[2],
-                                'tipteam1': tip[0],
-                                'tipteam2': tip[1]}
-                            files = [
-
-                            ]
-                            headers = {}
-
-                            response = requests.request(
-                                "POST", url, headers=headers, data=payload, files=files)
-                    except IndexError:
-                        pass
-
-                else:
-                    print("Game starts in more than 2 hours. Skipping...")
-                    print()
-            else:
-                # print out the tipped game
-                print(homeTeam + " - " + awayTeam)
-                
-                print("Game already tipped! Tip: " + homeTipEntry.get_attribute('value') + " - " + awayTipEntry.get_attribute('value'))
-                print()
-
-        except NoSuchElementException:
-            continue
-    sleep(0.1)
-
-    # submit all tips
-    driver.find_element(by=By.NAME, value="submitbutton").submit()
-
-    # print Quotes
-    try:
-        print("Total bet: " + str(driver.find_element(by=By.XPATH,
-              value='//*[@id="kicktipp-content"]/div[3]/div[2]/a/div/div[1]/div[1]/div[1]/div[2]/span[2]')
-                                  .get_property('innerHTML')
-                                  .replace('&nbsp;', ''))
-              + "\n")
-    except NoSuchElementException:
-        print("Total bet not found")
-
-    try:
-        if sys.argv[1] == 'local':
-            print("Sleeping for 20secs to see the result - Debug Mode\n")
-            sleep(20)
-    except IndexError:
-        pass
-
-    driver.quit()
-
-
-def calculate_tip(home, draw, away):
-    """ Calculates the tip based on the quotes"""
-
-    # if negative the home team is more likely to win
-    differenceHomeAndAway = home - away
-
-    # generate random number between 0 and 1
-    onemore = round(random.uniform(0, 1))
-
-    # depending on the quotes, the factor is derived to decrease the tip for very unequal games
-    coefficient = 0.3 if round(abs(differenceHomeAndAway)) > 7 else 0.75
-
-    # calculate tips
-    if abs(differenceHomeAndAway) < 0.25:
-        return onemore, onemore
-    else:
-        if differenceHomeAndAway < 0:
-            return round(-differenceHomeAndAway * coefficient) + onemore, onemore
-        elif differenceHomeAndAway > 0:
-            return onemore, round(differenceHomeAndAway * coefficient) + onemore
-        else:
-            return onemore, onemore
 
 
 def set_chrome_options() -> None:
@@ -217,12 +260,17 @@ def set_chrome_options() -> None:
 
 if __name__ == '__main__':
     while True:
+        if EMAIL is None or PASSWORD is None or NAME_OF_COMPETITION is None:
+            print("Please set the environment variables KICKTIPP_EMAIL, KICKTIPP_PASSWORD and KICKTIPP_NAME_OF_COMPETITION")
+            exit(1)
+
         now = datetime.now().strftime('%d.%m.%y %H:%M')
         print(now + ": The script will execute now!\n")
+
         try:
-            execute()
+            tip_all_games()
         except Exception as e:
-            print("An error occured: " + str(e) + "\n")
-        now = datetime.now().strftime('%d.%m.%y %H:%M')
+            print(str(e) + "\n")
+
         print(now + ": The script has finished. Sleeping for 1 hour...\n")
-        sleep(60*60)
+        sleep(3600)

@@ -8,6 +8,3 @@
 
 # Ignore Kubernetes secrets
 my-secrets.yaml
-
-# Chromedriver (if it is stored in the project)
-chromedriver

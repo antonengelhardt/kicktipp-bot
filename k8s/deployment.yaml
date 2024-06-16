@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kicktipp-bot
+  namespace: kicktipp-bot
+  labels:
+    app: kicktipp-bot
+
+spec:
+  selector:
+    matchLabels:
+      app: kicktipp-bot
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 100%
+
+  replicas: 1
+
+  template:
+    metadata:
+      labels:
+        app: kicktipp-bot
+
+    spec:
+      imagePullSecrets:
+        - name: ghcr
+
+      containers:
+        - name: kicktipp-bot
+          image: ghcr.io/antonengelhardt/kicktipp-bot:amd64
+          imagePullPolicy: Always
+
+          command: ["python3", "main.py", "--headless"]
+
+          envFrom:
+            - configMapRef:
+                name: kicktipp-bot-config
+            - secretRef:
+                name: kicktipp-bot-secrets
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 40Mi
+            limits:
+              cpu: 300m
+              memory: 200Mi
+
+      restartPolicy: Always

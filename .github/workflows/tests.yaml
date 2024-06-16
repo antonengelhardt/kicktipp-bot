@@ -1,0 +1,45 @@
+name: PR checks
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    name: Push Docker image to GHCR
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup QEMU
+      uses: docker/setup-qemu-action@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build and push amd64 Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: Dockerfile
+        push: true
+        platforms: linux/amd64
+        tags: ghcr.io/antonengelhardt/kicktipp-bot:${{ github.event.number }}-amd64
+
+    # - name: Build and push arm64 Docker image
+    #   uses: docker/build-push-action@v2
+    #   with:
+    #     context: .
+    #     file: Dockerfile
+    #     push: true
+    #     platforms: linux/arm64
+    #     tags: ghcr.io/antonengelhardt/kicktipp-bot:arm64
