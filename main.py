@@ -229,6 +229,9 @@ def send_ntfy_notification(time, home_team, away_team, quotes, tip):
                 "X-Title": f"{home_team} - {away_team} tipped {tip[0]}:{tip[1]}",
             }
 
+            # utf-8 encode headers
+            headers = {k: v.encode('utf-8') for k, v in headers.items()}
+
             requests.post(NTFY_URL, auth=(
                 NTFY_USERNAME, NTFY_PASSWORD), data=data, headers=headers)
 
