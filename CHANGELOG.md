@@ -6,23 +6,24 @@ All notable changes to this project will be documented in this file.
 
 ### 🚀 Features
 
-- *(docker)* Add dockerignore file
-- *(docker-compose)* Add build and image docker compose files
-- *(changelog)* Changelog, git cliff init, prefix dependabot commit msg
-- *(codeowners)* Add codeowners
-- *(github)* Add pr and issue template
-- *(ci)* Rename main ci, add tests and release ci
+- **(docker)** Add dockerignore file
+- **(docker-compose)** Add build and image docker compose files
+- **(changelog)** Changelog, git cliff init, prefix dependabot commit msg
+- **(codeowners)** Add codeowners
+- **(github)** Add pr and issue template
+- **(ci)** Rename main ci, add tests and release ci
+- **(notify)** Add ntfy support
 
 ### 🐛 Bug Fixes
 
 - Requirements.txt to reduce vulnerabilities
-- *(make)* Commands up2date
-- *(docker)* Finally fix docker image
-- *(license)* Formatting
-- *(ci)* Github ci
-- *(docker)* No need for packages
-- *(ci)* Env in ci fixed
-- *(ci)* Cd before .env creation
+- **(make)** Commands up2date
+- **(docker)** Finally fix docker image
+- **(license)** Formatting
+- **(ci)** Github ci
+- **(docker)** No need for packages
+- **(ci)** Env in ci fixed
+- **(ci)** Cd before .env creation
 
 ### 🚜 Refactor
 
