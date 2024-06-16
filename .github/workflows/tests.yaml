@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  push:
+  build:
     name: Push Docker image to GHCR
     runs-on: ubuntu-latest
     permissions:

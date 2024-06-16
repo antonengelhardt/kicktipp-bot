@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - **(docker)** No need for packages
 - **(ci)** Env in ci fixed
 - **(ci)** Cd before .env creation
+- **(cliff)** Bold scope
 
 ### 🚜 Refactor
 
