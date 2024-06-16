@@ -31,7 +31,18 @@ ghcr.io/antonengelhardt/kicktipp-bot:amd64
 | `KICKTIPP_HOURS_UNTIL_GAME` | The script will tip games which start in the next x hours | `24` | No |
 | `CHROMEDRIVER_PATH` | The path to the chromedriver binary | `/usr/bin/chromedriver` | No |
 | `ZAPIER_URL` | The URL of your Zapier Webhook | `https://hooks.zapier.com/hooks/catch/123456/abcdef/` | No |
+| `NTFY_URL` | The URL of your NTFY Webhook | `https://ntfy.your-domain.com` | No |
+| `NTFY_USERNAME` | The username for your NTFY Webhook | `username` | No |
+| `NTFY_PASSWORD` | The password for your NTFY Webhook | `password` | No |
 
-## Zapier Integration
+## Notifications
 
-If you want to receive a notification when the script tips for a match, you can use the Zapier integration. Please create a Zapier Account and set up the following Trigger: Custom Webhook. Please also make sure you set the ENV Variable `ZAPIER_URL` to the URL of your custom webhook. Then you can set up actions like sending an email or a push notification.
+If you want to receive a notification when the script tips for a match, you can use the Zapier or NTFY integration.
+
+### Zapier
+
+Please create a Zapier Account and set up the following Trigger: Custom Webhook. Please also make sure you set the ENV Variable `ZAPIER_URL` to the URL of your custom webhook. Then you can set up actions like sending an email or a push notification.
+
+### NTFY
+
+Set up your [ntfy](https://github.com/binwiederhier/ntfy?tab=readme-ov-file) server and set the ENV Variables `NTFY_URL`, `NTFY_USERNAME` and `NTFY_PASSWORD` to the values of your server. Create the topic `kicktipp-bot` and subscribe to it. Then you will receive a notification when the script tips for a match.

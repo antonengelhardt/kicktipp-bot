@@ -23,6 +23,9 @@ CHROMEDRIVER_PATH = os.getenv("CHROMEDRIVER_PATH")
 ZAPIER_URL = os.getenv("ZAPIER_URL")
 TIME_UNTIL_GAME = os.getenv("KICKTIPP_HOURS_UNTIL_GAME") != None and timedelta(
     hours=int(os.getenv("KICKTIPP_HOURS_UNTIL_GAME"))) or timedelta(hours=2)
+NTFY_URL = os.getenv("NTFY_URL")
+NTFY_USERNAME = os.getenv("NTFY_USERNAME")
+NTFY_PASSWORD = os.getenv("NTFY_PASSWORD")
 
 
 def tip_all_games():
@@ -193,11 +196,13 @@ def tip_game(driver, i):
         # custom webhook to zapier
         send_zapier_webhook(time, home_team, away_team, quotes, tip)
 
+        # ntfy notification
+        send_ntfy_notification(time, home_team, away_team, quotes, tip)
+
 
 def send_zapier_webhook(time, home_team, away_team, quotes, tip):
-    try:
-        if ZAPIER_URL is not None:
-
+    if ZAPIER_URL is not None:
+        try:
             payload = {
                 'date': time,
                 'team1': home_team,
@@ -210,10 +215,26 @@ def send_zapier_webhook(time, home_team, away_team, quotes, tip):
             files = []
             headers = {}
 
-            requests.request("POST", ZAPIER_URL, headers=headers,
-                             data=payload, files=files)
-    except IndexError:
-        pass
+            requests.post(ZAPIER_URL, headers=headers,
+                          data=payload, files=files)
+        except IndexError:
+            pass
+
+
+def send_ntfy_notification(time, home_team, away_team, quotes, tip):
+    if NTFY_URL is not None and NTFY_USERNAME is not None and NTFY_PASSWORD is not None:
+        try:
+            data = f"Time: {time.strftime('%d.%m.%y %H:%M')}\nQuotes: {quotes}"
+
+            headers = {
+                "X-Title": f"{home_team} - {away_team} tipped {tip[0]}:{tip[1]}",
+            }
+
+            requests.post(NTFY_URL, auth=(
+                NTFY_USERNAME, NTFY_PASSWORD), data=data, headers=headers)
+
+        except IndexError:
+            pass
 
 
 def accept_agbs(driver):
