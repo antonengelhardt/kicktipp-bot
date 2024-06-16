@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.1] - 2024-06-16
+
+### 🐛 Bug Fixes
+
+- **(notify)** Header must be utf-8 encoded
+- **(ci)** Extract tag name from github event number
+- **(ci)** Prefix pr docker image with `pr-`
+
 ## [2.0.0] - 2024-06-16
 
 ### 🚀 Features
