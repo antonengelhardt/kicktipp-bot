@@ -2,3 +2,5 @@
 .DS_Store
 .idea/
 *.iml
+
+my-secrets.yaml

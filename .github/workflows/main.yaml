@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - reviving-this-project
 
 jobs:
   push:
@@ -76,3 +77,10 @@ jobs:
             docker stop kicktipp-bot || true
             docker rm kicktipp-bot || true
             docker run -itd --restart unless-stopped --name kicktipp-bot --env-file .env ghcr.io/antonengelhardt/kicktipp-bot:amd64
+
+      - name: Deploy to Kubernetes
+        uses: actions-hub/kubectl@master
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+        with:
+          args: rollout restart deployment kicktipp-bot -n kicktipp-bot

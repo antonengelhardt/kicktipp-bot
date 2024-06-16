@@ -21,6 +21,8 @@ docker run \
 ghcr.io/antonengelhardt/kicktipp-bot:amd64
 ```
 
+or deploy with Kubernetes.
+
 ## Environment Variables
 
 | Variable | Description | Example | Required |
