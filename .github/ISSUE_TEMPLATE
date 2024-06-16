@@ -1,1 +1,28 @@
-Before starting a PR, please make sure you have read all Documentation thats available.
+## Environment
+
+<!--- How are you running the bot? Docker, Python, etc. -->
+
+- Python:
+- Docker:
+- OS:
+- Browser:
+
+## Pre-Condition
+
+<! -- What are the preconditions for the issue to occur? -->
+
+## Steps to Reproduce
+
+1.
+
+## Expected Behavior
+
+<!--- What should have happened? -->
+
+## Actual Behavior
+
+<!--- What actually happened? -->
+
+## Additional Information
+
+<!--- Any additional information, configuration or data that might be necessary to reproduce the issue. -->
