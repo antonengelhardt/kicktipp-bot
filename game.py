@@ -1,9 +1,12 @@
 import random
 
 """ This class represents a game with the home team, away team, quotes and time """
+
+
 class Game:
 
     """ Constructor for the game class """
+
     def __init__(self, home_team, away_team, quotes, time):
         self.home_team = home_team
         self.away_team = away_team

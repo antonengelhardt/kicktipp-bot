@@ -67,6 +67,7 @@ jobs:
             echo "KICKTIPP_PASSWORD=${{ secrets.KICKTIPP_PASSWORD }}" >> .env
             echo "KICKTIPP_NAME_OF_COMPETITION=${{ secrets.KICKTIPP_NAME_OF_COMPETITION }}" >> .env
             echo "KICKTIPP_HOURS_UNTIL_GAME=10" >> .env
+            echo "KICKTIPP_RUN_EVERY_X_MINUTES=30" >> .env
             echo "ZAPIER_URL=${{ secrets.ZAPIER_URL }}" >> .env
             echo "NTFY_URL=${{ secrets.NTFY_URL }}" >> .env
             echo "NTFY_USERNAME=${{ secrets.NTFY_USERNAME }}" >> .env

@@ -15,6 +15,7 @@ from game import Game
 # Constants
 BASE_URL = "https://www.kicktipp.de/"
 LOGIN_URL = "https://www.kicktipp.de/info/profil/login/"
+RUN_EVERY_X_MINUTES = os.getenv("KICKTIPP_RUN_EVERY_X_MINUTES") or 60
 EMAIL = os.getenv("KICKTIPP_EMAIL")
 PASSWORD = os.getenv("KICKTIPP_PASSWORD")
 NAME_OF_COMPETITION = os.getenv("KICKTIPP_NAME_OF_COMPETITION")
@@ -275,5 +276,6 @@ if __name__ == '__main__':
         except Exception as e:
             print(str(e) + "\n")
 
-        print(now + ": The script has finished. Sleeping for 1 hour...\n")
-        sleep(3600)
+        print(
+            now + f": The script has finished. Sleeping for {RUN_EVERY_X_MINUTES} minutes\n")
+        sleep(int(RUN_EVERY_X_MINUTES) * 60)
