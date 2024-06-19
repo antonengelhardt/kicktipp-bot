@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2024-06-19
+
+### 🚀 Features
+
+- **(env)** Configure the sleep duration
+
+### ⚙️ Miscellaneous Tasks
+
+- **(gg)** Switch from gitleaks to ggshield
+
 ## [2.0.1] - 2024-06-16
 
 ### 🐛 Bug Fixes
