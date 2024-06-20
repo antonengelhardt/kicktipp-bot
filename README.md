@@ -6,7 +6,24 @@ This script can automatically enter tips into Kicktipp based on the quotes of th
 
 Copy the contents of the `.env.example` file into a new file called `.env` and fill in the values.
 
-Execute the commands below in the `Terminal`-Program. Pre-requisites are `Python`, `pip` and `Docker`.
+### Python
+
+If you use the [fish shell](https://fishshell.com/), you can use the `envsource .env` command, from [this GitHub Gist](https://gist.github.com/nikoheikkila/dd4357a178c8679411566ba2ca280fcc) to load the environment variables.
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the script
+python main.py
+
+# Headless mode
+python main.py --headless
+```
+
+### Docker
+
+Install Docker and run the following commands.
 
 ```bash
 # Get Image
