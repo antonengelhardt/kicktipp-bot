@@ -117,13 +117,26 @@ def login(driver):
 
 def tip_game(driver, i):
 
-    xpath_row = '//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']'
+    # time of game, if empty, use previous row's time
+    for j in range(i, 0, -1):
+        xpath_row = '//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(j) + ']'
+        try:
+            time = datetime.strptime(
+                driver.find_element(
+                    by=By.XPATH, value=xpath_row + '/td[1]').get_property('innerHTML'),
+                '%d.%m.%y %H:%M')
+            if time is not None:
+                break
+        except ValueError:
+            continue
 
-    # time of game
-    time = datetime.strptime(
-        driver.find_element(
-            by=By.XPATH, value=xpath_row + '/td[1]').get_property('innerHTML'),
-        '%d.%m.%y %H:%M')
+    # if time is still None, use current time
+    if time is None:
+        print("Time not found, using current time as default.")
+        time = datetime.now()
+
+    # xpath to row
+    xpath_row = '//*[@id="tippabgabeSpiele"]/tbody/tr[' + str(i) + ']'
 
     # get Team names
     home_team = driver.find_element(
