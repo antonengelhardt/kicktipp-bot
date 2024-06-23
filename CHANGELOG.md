@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.1] - 2024-06-23
+
+### 🐛 Bug Fixes
+
+- **(env)** Comment out `CHROMEDRIVER_PATH`
+- **(time)** If a row does not have a time field, use `now()`
+
+### 📚 Documentation
+
+- **(readme)** Add python commands
+
 ## [2.1.0] - 2024-06-19
 
 ### 🚀 Features
