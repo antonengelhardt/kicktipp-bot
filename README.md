@@ -66,3 +66,7 @@ Please create a Zapier Account and set up the following Trigger: Custom Webhook.
 ### NTFY
 
 Set up your [ntfy](https://github.com/binwiederhier/ntfy?tab=readme-ov-file) server and set the ENV Variables `NTFY_URL`, `NTFY_USERNAME` and `NTFY_PASSWORD` to the values of your server. Create the topic `kicktipp-bot` and subscribe to it. Then you will receive a notification when the script tips for a match.
+
+## Related projects
+
+- [kicktipp-bot-serverless](https://github.com/tbrodbeck/kicktipp-bot-serverless) (written by [tbrodbeck](https://github.com/tbrodbeck)) uses Playwright instead of Selenium and runs as a one time job, so that it can be scheduled by other tools like Cron
