@@ -26,6 +26,7 @@ TIME_UNTIL_GAME = os.getenv("KICKTIPP_HOURS_UNTIL_GAME") != None and timedelta(
 NTFY_URL = os.getenv("NTFY_URL")
 NTFY_USERNAME = os.getenv("NTFY_USERNAME")
 NTFY_PASSWORD = os.getenv("NTFY_PASSWORD")
+HOME_ASSISTANT_WEBHOOK_URL = os.getenv("HOME_ASSISTANT_WEBHOOK_URL")
 
 
 def tip_all_games():
@@ -212,6 +213,9 @@ def tip_game(driver, i):
         # ntfy notification
         send_ntfy_notification(time, home_team, away_team, quotes, tip)
 
+        send_home_assistant_notification(
+            time, home_team, away_team, quotes, tip)
+
 
 def send_zapier_webhook(time, home_team, away_team, quotes, tip):
     if ZAPIER_URL is not None:
@@ -248,6 +252,28 @@ def send_ntfy_notification(time, home_team, away_team, quotes, tip):
 
             requests.post(NTFY_URL, auth=(
                 NTFY_USERNAME, NTFY_PASSWORD), data=data, headers=headers)
+
+        except IndexError:
+            pass
+
+
+def send_home_assistant_notification(time, home_team, away_team, quotes, tip):
+    if HOME_ASSISTANT_WEBHOOK_URL is not None:
+        try:
+            data = {
+                "home_team": home_team,
+                "away_team": away_team,
+                "quotes": quotes,
+                "tip": tip,
+                "time": time.strftime('%d.%m.%y %H:%M')
+            }
+
+            headers = {
+                "Content-Type": "application/json",
+            }
+
+            requests.post(HOME_ASSISTANT_WEBHOOK_URL,
+                          json=data, headers=headers)
 
         except IndexError:
             pass

@@ -4,6 +4,9 @@ metadata:
   name: kicktipp-bot-config
   namespace: kicktipp-bot
 data:
+  # do not modify this or you will see no output
   PYTHONUNBUFFERED: "1"
+
+  # optional environment variables
   KICKTIPP_HOURS_UNTIL_GAME: "10"
   KICKTIPP_RUN_EVERY_X_MINUTES: "30"
