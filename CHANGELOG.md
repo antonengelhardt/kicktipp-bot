@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v2.1.2] - 2024-08-29
+
+### 🚀 Features
+
+- **(notify)** Add home assistant support
+
+### 🚜 Refactor
+
+- Generic webhook
+
+### 📚 Documentation
+
+- **(readme)** Mention kicktipp-bot-serveless project by tbrodbeck
+
 ## [2.1.1] - 2024-06-23
 
 ### 🐛 Bug Fixes
