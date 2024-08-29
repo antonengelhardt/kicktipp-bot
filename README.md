@@ -54,6 +54,7 @@ or deploy with Kubernetes.
 | `NTFY_URL` | The URL of your NTFY Webhook | `https://ntfy.your-domain.com` | No |
 | `NTFY_USERNAME` | The username for your NTFY Webhook | `username` | No |
 | `NTFY_PASSWORD` | The password for your NTFY Webhook | `password` | No |
+| `WEBHOOK_URL` | The URL of some generic webhook. | `https://your-home-assistant-url.com/api/webhook/your-webhook-id` | No |
 
 ## Notifications
 
@@ -66,6 +67,10 @@ Please create a Zapier Account and set up the following Trigger: Custom Webhook.
 ### NTFY
 
 Set up your [ntfy](https://github.com/binwiederhier/ntfy?tab=readme-ov-file) server and set the ENV Variables `NTFY_URL`, `NTFY_USERNAME` and `NTFY_PASSWORD` to the values of your server. Create the topic `kicktipp-bot` and subscribe to it. Then you will receive a notification when the script tips for a match.
+
+### Generic Webhook
+
+Set up a webhook (e.g in [Home Assistant](https://www.home-assistant.io/integrations/webhook/)) and set the ENV Variable `WEBHOOK_URL` to the URL of your webhook. Then you will receive a notification when the script tips for a match.
 
 ## Related projects
 
