@@ -9,6 +9,8 @@ import logging
 import sys
 from datetime import datetime
 from time import sleep
+import sentry_sdk
+import os
 
 from .config import Config
 from .webdriver.webdriver_manager import WebDriverManager
@@ -113,6 +115,8 @@ def main() -> None:
     """Main entry point for the Kicktipp bot."""
     # Check for debug mode
     debug_mode = len(sys.argv) > 1 and '--debug' in sys.argv
+    if debug_mode:
+        logger.info("Debug mode enabled - detailed logging active")
 
     # Setup logging with appropriate level
     setup_logging(debug_mode)
@@ -131,8 +135,16 @@ def main() -> None:
                 f"Run interval={Config.RUN_EVERY_X_MINUTES}min, "
                 f"Tip threshold={Config.TIME_UNTIL_GAME}")
 
-    if debug_mode:
-        logger.info("Debug mode enabled - detailed logging active")
+    if os.getenv("SENTRY_DSN"):
+        sentry_sdk.init(
+            dsn=os.getenv("SENTRY_DSN"),
+            environment=os.getenv("SENTRY_ENVIRONMENT", "production"),
+            send_default_pii=True,
+            traces_sample_rate=1.0,
+            profiles_sample_rate=1.0,
+        )
+
+        logger.info("Sentry initialized successfully")
 
     # Start health monitoring
     health_monitor.start_health_server()
