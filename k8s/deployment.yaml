@@ -33,7 +33,16 @@ spec:
           image: ghcr.io/antonengelhardt/kicktipp-bot:amd64
           imagePullPolicy: Always
 
-          command: ["python3", "main.py", "--headless"]
+          command: ["python3", "run.py", "--headless"]
+
+          ports:
+            - name: health
+              containerPort: 8080
+              protocol: TCP
+
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
 
           envFrom:
             - configMapRef:
@@ -41,12 +50,45 @@ spec:
             - secretRef:
                 name: kicktipp-bot-secrets
 
+          # Startup probe - allows container time to start up
+          startupProbe:
+            httpGet:
+              path: /health
+              port: health
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+            successThreshold: 1
+
+          # Liveness probe - restarts container if unhealthy
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: health
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+
+          # Readiness probe - controls traffic routing
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: health
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 2
+            successThreshold: 1
+
           resources:
             requests:
-              cpu: 100m
-              memory: 40Mi
+              cpu: 250m
+              memory: 400Mi
             limits:
-              cpu: 300m
-              memory: 200Mi
+              cpu: 500m
+              memory: 800Mi
 
       restartPolicy: Always

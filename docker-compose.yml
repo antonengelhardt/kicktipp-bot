@@ -1,9 +1,0 @@
-version: '3.7'
-
-services:
-  kicktipp-bot:
-    platform: linux/amd64
-    image: ghcr.io/antonengelhardt/kicktipp-bot:amd64
-    container_name: kicktipp-bot
-    restart: unless-stopped
-    env_file: .env

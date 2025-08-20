@@ -30,7 +30,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: .
-        file: Dockerfile
+        file: docker/Dockerfile
         push: true
         platforms: linux/amd64
         tags: ghcr.io/antonengelhardt/kicktipp-bot:pr-${{ github.event.number }}-amd64

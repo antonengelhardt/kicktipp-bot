@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kicktipp-bot-health
+  namespace: kicktipp-bot
+  labels:
+    app: kicktipp-bot
+spec:
+  selector:
+    app: kicktipp-bot
+  ports:
+    - name: health
+      port: 8080
+      targetPort: health
+      protocol: TCP
+  type: ClusterIP
