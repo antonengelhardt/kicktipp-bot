@@ -2,6 +2,8 @@
 
 This script can automatically enter tips into Kicktipp based on the quotes of the bookmakers. It is written in Python and uses Selenium to interact with the website.
 
+If you are enjoying this project, consider [buying me a coffee](https://buymeacoffee.com/antonengelhardt) :)
+
 ## Run
 
 Copy the contents of the `.env.example` file into a new file called `.env` and fill in the values.
@@ -15,10 +17,10 @@ If you use the [fish shell](https://fishshell.com/), you can use the `envsource 
 pip install -r requirements.txt
 
 # Run the script
-python main.py
+python run.py
 
 # Headless mode
-python main.py --headless
+python run.py --headless
 ```
 
 ### Docker
@@ -42,19 +44,19 @@ or deploy with Kubernetes.
 
 ## Environment Variables
 
-| Variable | Description | Example | Required |
-| --- | --- | --- | --- |
-| `KICKTIPP_EMAIL` | Your Kicktipp email | `email@example.com` | Yes |
-| `KICKTIPP_PASSWORD` | Your Kicktipp password | `password` | Yes |
-| `KICKTIPP_NAME_OF_COMPETITION` | The name of the competition you want to tip for | `mycoolfriendgroup` | Yes |
-| `KICKTIPP_HOURS_UNTIL_GAME` | The script will tip games which start in the next x hours | `24` | No |
-| `KICKTIPP_RUN_EVERY_X_MINUTES` | The script will run every x minutes | `60` | No |
-| `CHROMEDRIVER_PATH` | The path to the chromedriver binary | `/usr/bin/chromedriver` | No |
-| `ZAPIER_URL` | The URL of your Zapier Webhook | `https://hooks.zapier.com/hooks/catch/123456/abcdef/` | No |
-| `NTFY_URL` | The URL of your NTFY Webhook | `https://ntfy.your-domain.com` | No |
-| `NTFY_USERNAME` | The username for your NTFY Webhook | `username` | No |
-| `NTFY_PASSWORD` | The password for your NTFY Webhook | `password` | No |
-| `WEBHOOK_URL` | The URL of some generic webhook. | `https://your-home-assistant-url.com/api/webhook/your-webhook-id` | No |
+| Variable                       | Description                                               | Example                                                           | Required |
+| ------------------------------ | --------------------------------------------------------- | ----------------------------------------------------------------- | -------- |
+| `KICKTIPP_EMAIL`               | Your Kicktipp email                                       | `email@example.com`                                               | Yes      |
+| `KICKTIPP_PASSWORD`            | Your Kicktipp password                                    | `password`                                                        | Yes      |
+| `KICKTIPP_NAME_OF_COMPETITION` | The name of the competition you want to tip for           | `mycoolfriendgroup`                                               | Yes      |
+| `KICKTIPP_HOURS_UNTIL_GAME`    | The script will tip games which start in the next x hours | `24`                                                              | No       |
+| `KICKTIPP_RUN_EVERY_X_MINUTES` | The script will run every x minutes                       | `60`                                                              | No       |
+| `CHROMEDRIVER_PATH`            | The path to the chromedriver binary                       | `/usr/bin/chromedriver`                                           | No       |
+| `ZAPIER_URL`                   | The URL of your Zapier Webhook                            | `https://hooks.zapier.com/hooks/catch/123456/abcdef/`             | No       |
+| `NTFY_URL`                     | The URL of your NTFY Webhook                              | `https://ntfy.your-domain.com`                                    | No       |
+| `NTFY_USERNAME`                | The username for your NTFY Webhook                        | `username`                                                        | No       |
+| `NTFY_PASSWORD`                | The password for your NTFY Webhook                        | `password`                                                        | No       |
+| `WEBHOOK_URL`                  | The URL of some generic webhook.                          | `https://your-home-assistant-url.com/api/webhook/your-webhook-id` | No       |
 
 ## Notifications
 

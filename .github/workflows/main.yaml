@@ -46,38 +46,6 @@ jobs:
     #     platforms: linux/arm64
     #     tags: ghcr.io/antonengelhardt/kicktipp-bot:arm64
 
-  deploy-to-server:
-    name: Deploy to Server
-    runs-on: ubuntu-latest
-    needs: push
-    steps:
-      - name: Deploy to Server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.PORT }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          script: |
-            cd ~/kicktipp-bot
-
-            rm -f .env
-            echo "KICKTIPP_EMAIL=${{ secrets.KICKTIPP_EMAIL }}" >> .env
-            echo "KICKTIPP_PASSWORD=${{ secrets.KICKTIPP_PASSWORD }}" >> .env
-            echo "KICKTIPP_NAME_OF_COMPETITION=${{ secrets.KICKTIPP_NAME_OF_COMPETITION }}" >> .env
-            echo "KICKTIPP_HOURS_UNTIL_GAME=10" >> .env
-            echo "KICKTIPP_RUN_EVERY_X_MINUTES=30" >> .env
-            echo "ZAPIER_URL=${{ secrets.ZAPIER_URL }}" >> .env
-            echo "NTFY_URL=${{ secrets.NTFY_URL }}" >> .env
-            echo "NTFY_USERNAME=${{ secrets.NTFY_USERNAME }}" >> .env
-            echo "NTFY_PASSWORD=${{ secrets.NTFY_PASSWORD }}" >> .env
-
-            docker pull ghcr.io/antonengelhardt/kicktipp-bot:amd64
-            docker stop kicktipp-bot || true
-            docker rm kicktipp-bot || true
-            docker run -itd --restart unless-stopped --name kicktipp-bot --env-file .env ghcr.io/antonengelhardt/kicktipp-bot:amd64
-
   deploy-to-kubernetes:
     name: Deploy to Kubernetes
     runs-on: ubuntu-latest
