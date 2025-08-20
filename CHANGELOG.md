@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.1.0] - 2025-08-20
+
+### 🚀 Features
+
+- **(sentry)** Optional sentry reporting
+
 ## [3.0.0] - 2025-08-20
 
 ### 🐛 Bug Fixes
