@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0] - 2025-08-20
+
+### 🐛 Bug Fixes
+
+- **(ci)** Fix dockerfile path
+- **(k8s)** Use default image again
+- **(k8s)** Remove service monitor
+- **(review)** Comments addressed
+- **(time)** Dynamic time extraction for different layouts
+- **(review)** Remove duplicate auth file and fix imports
+
+### 🚜 Refactor
+
+- Modularise files, proper error handling, logging, healthcheck
+
+### 🎨 Styling
+
+- **(fmt)** Format using autopep8
+
 ## [v2.1.2] - 2024-08-29
 
 ### 🚀 Features
