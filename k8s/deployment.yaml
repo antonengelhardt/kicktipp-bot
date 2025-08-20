@@ -30,7 +30,7 @@ spec:
 
       containers:
         - name: kicktipp-bot
-          image: ghcr.io/antonengelhardt/kicktipp-bot:refactor-v3-check
+          image: ghcr.io/antonengelhardt/kicktipp-bot:amd64
           imagePullPolicy: Always
 
           command: ["python3", "run.py", "--headless"]
