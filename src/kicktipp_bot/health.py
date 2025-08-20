@@ -91,10 +91,12 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
 
         if status["healthy"]:
             self.send_response(200)
-            response = {"status": "healthy", "timestamp": datetime.now().isoformat()}
+            response = {"status": "healthy",
+                        "timestamp": datetime.now().isoformat()}
         else:
             self.send_response(503)
-            response = {"status": "unhealthy", "timestamp": datetime.now().isoformat()}
+            response = {"status": "unhealthy",
+                        "timestamp": datetime.now().isoformat()}
 
         self.send_header('Content-Type', 'application/json')
         self.end_headers()
@@ -125,7 +127,8 @@ class HealthMonitor:
     def start_health_server(self) -> None:
         """Start the health check HTTP server."""
         try:
-            self.server = HTTPServer(('0.0.0.0', self.port), HealthCheckHandler)
+            self.server = HTTPServer(
+                ('0.0.0.0', self.port), HealthCheckHandler)
             self.server_thread = threading.Thread(
                 target=self.server.serve_forever,
                 daemon=True,
@@ -133,7 +136,8 @@ class HealthMonitor:
             )
             self.server_thread.start()
             logger.info(f"Health check server started on port {self.port}")
-            logger.info(f"Health endpoints: http://localhost:{self.port}/health, http://localhost:{self.port}/status")
+            logger.info(
+                f"Health endpoints: http://localhost:{self.port}/health, http://localhost:{self.port}/status")
         except Exception as e:
             logger.error(f"Failed to start health check server: {e}")
 
@@ -168,4 +172,5 @@ class HealthMonitor:
 
 # Global health status instance
 health_status = HealthStatus()
-health_monitor = HealthMonitor(port=int(os.getenv("HEALTH_CHECK_PORT", "8080")))
+health_monitor = HealthMonitor(
+    port=int(os.getenv("HEALTH_CHECK_PORT", "8080")))

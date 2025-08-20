@@ -79,7 +79,8 @@ class GameTipper:
 
             # Debug mode sleep
             if self._is_debug_mode():
-                logger.info("Local debug mode - sleeping for 20 seconds to review results")
+                logger.info(
+                    "Local debug mode - sleeping for 20 seconds to review results")
                 sleep(20)
 
         except GameTippingError:
@@ -94,20 +95,24 @@ class GameTipper:
         logger.debug("Counting available games")
 
         # Try to find the games table first
-        table = SeleniumUtils.safe_find_element(self.driver, By.ID, "tippabgabeSpiele")
+        table = SeleniumUtils.safe_find_element(
+            self.driver, By.ID, "tippabgabeSpiele")
         if not table:
             logger.warning("Could not find tipping table (tippabgabeSpiele)")
             return 0
 
-        games = SeleniumUtils.safe_find_elements(self.driver, By.CLASS_NAME, "datarow")
+        games = SeleniumUtils.safe_find_elements(
+            self.driver, By.CLASS_NAME, "datarow")
         count = len(games)
         logger.debug(f"Found {count} game rows with class 'datarow'")
 
         # If no datarow elements, try alternative selectors
         if count == 0:
-            logger.debug("No 'datarow' elements found, trying alternative selectors")
+            logger.debug(
+                "No 'datarow' elements found, trying alternative selectors")
             # Try finding table rows in the tipping table
-            table_rows = SeleniumUtils.safe_find_elements(self.driver, By.XPATH, '//*[@id="tippabgabeSpiele"]//tr')
+            table_rows = SeleniumUtils.safe_find_elements(
+                self.driver, By.XPATH, '//*[@id="tippabgabeSpiele"]//tr')
             logger.debug(f"Found {len(table_rows)} total table rows")
 
             # Filter out header rows (usually first row)
@@ -135,25 +140,30 @@ class GameTipper:
         # Extract game information
         game_info = self._extract_game_info(game_index)
         if not game_info:
-            logger.warning(f"Could not extract game info for game {game_index}")
+            logger.warning(
+                f"Could not extract game info for game {game_index}")
             return False
 
         game_time, home_team, away_team = game_info
 
-        logger.info(f"Processing: {home_team} vs {away_team} | Time: {game_time.strftime('%d.%m.%y %H:%M')}")
+        logger.info(
+            f"Processing: {home_team} vs {away_team} | Time: {game_time.strftime('%d.%m.%y %H:%M')}")
 
         # Check if game can be tipped
         tip_fields = self._get_tip_fields(xpath_row)
         if not tip_fields:
-            logger.debug(f"Game {game_index} cannot be tipped (likely finished)")
+            logger.debug(
+                f"Game {game_index} cannot be tipped (likely finished)")
             return False
 
         home_tip_field, away_tip_field = tip_fields
 
         # Check if already tipped
         if self._is_already_tipped(home_tip_field, away_tip_field):
-            home_val = SeleniumUtils.safe_get_attribute(home_tip_field, 'value', 'home tip field') or ''
-            away_val = SeleniumUtils.safe_get_attribute(away_tip_field, 'value', 'away tip field') or ''
+            home_val = SeleniumUtils.safe_get_attribute(
+                home_tip_field, 'value', 'home tip field') or ''
+            away_val = SeleniumUtils.safe_get_attribute(
+                away_tip_field, 'value', 'away tip field') or ''
             logger.info(f"Game already tipped: {home_val} - {away_val}")
             return False
 
@@ -187,7 +197,8 @@ class GameTipper:
                     game_time, home_team, away_team, quotes, tip
                 )
             except Exception as e:
-                logger.warning(f"Failed to send notifications for game {game_index}: {e}")
+                logger.warning(
+                    f"Failed to send notifications for game {game_index}: {e}")
                 # Don't fail the whole process for notification errors
 
             return True
@@ -198,7 +209,8 @@ class GameTipper:
 
     def _row_exists(self, xpath_row: str) -> bool:
         """Check if a game row exists."""
-        element = SeleniumUtils.safe_find_element(self.driver, By.XPATH, xpath_row, timeout=3)
+        element = SeleniumUtils.safe_find_element(
+            self.driver, By.XPATH, xpath_row, timeout=3)
         return element is not None
 
     def _extract_game_info(self, game_index: int) -> Optional[tuple]:
@@ -210,27 +222,35 @@ class GameTipper:
             # Get team names
             xpath_row = f'//*[@id="tippabgabeSpiele"]/tbody/tr[{game_index}]'
 
-            home_team_element = SeleniumUtils.safe_find_element(self.driver, By.XPATH, f'{xpath_row}/td[2]')
+            home_team_element = SeleniumUtils.safe_find_element(
+                self.driver, By.XPATH, f'{xpath_row}/td[2]')
             if not home_team_element:
-                logger.warning(f"Could not find home team for game {game_index}")
+                logger.warning(
+                    f"Could not find home team for game {game_index}")
                 return None
 
-            away_team_element = SeleniumUtils.safe_find_element(self.driver, By.XPATH, f'{xpath_row}/td[3]')
+            away_team_element = SeleniumUtils.safe_find_element(
+                self.driver, By.XPATH, f'{xpath_row}/td[3]')
             if not away_team_element:
-                logger.warning(f"Could not find away team for game {game_index}")
+                logger.warning(
+                    f"Could not find away team for game {game_index}")
                 return None
 
-            home_team = SeleniumUtils.safe_get_attribute(home_team_element, 'innerHTML', 'home team')
-            away_team = SeleniumUtils.safe_get_attribute(away_team_element, 'innerHTML', 'away team')
+            home_team = SeleniumUtils.safe_get_attribute(
+                home_team_element, 'innerHTML', 'home team')
+            away_team = SeleniumUtils.safe_get_attribute(
+                away_team_element, 'innerHTML', 'away team')
 
             if not home_team or not away_team:
-                logger.warning(f"Could not extract team names for game {game_index}")
+                logger.warning(
+                    f"Could not extract team names for game {game_index}")
                 return None
 
             return game_time, home_team.strip(), away_team.strip()
 
         except Exception as e:
-            logger.error(f"Error extracting game info for game {game_index}: {e}")
+            logger.error(
+                f"Error extracting game info for game {game_index}: {e}")
             return None
 
     def _find_game_time(self, game_index: int) -> datetime:
@@ -238,11 +258,13 @@ class GameTipper:
         for row_index in range(game_index, 0, -1):
             xpath_row = f'//*[@id="tippabgabeSpiele"]/tbody/tr[{row_index}]'
 
-            time_element = SeleniumUtils.safe_find_element(self.driver, By.XPATH, f'{xpath_row}/td[1]', timeout=2)
+            time_element = SeleniumUtils.safe_find_element(
+                self.driver, By.XPATH, f'{xpath_row}/td[1]', timeout=2)
             if not time_element:
                 continue
 
-            time_text = SeleniumUtils.safe_get_attribute(time_element, 'innerHTML', f'time cell row {row_index}')
+            time_text = SeleniumUtils.safe_get_attribute(
+                time_element, 'innerHTML', f'time cell row {row_index}')
             if not time_text:
                 continue
 
@@ -251,28 +273,35 @@ class GameTipper:
                 try:
                     return datetime.strptime(time_text, '%d.%m.%y %H:%M')
                 except ValueError as e:
-                    logger.debug(f"Could not parse time '{time_text}' from row {row_index}: {e}")
+                    logger.debug(
+                        f"Could not parse time '{time_text}' from row {row_index}: {e}")
                     continue
 
         # Fallback to current time if no time found
-        logger.warning("Could not find game time, using current time as fallback")
+        logger.warning(
+            "Could not find game time, using current time as fallback")
         return datetime.now()
 
     def _get_tip_fields(self, xpath_row: str) -> Optional[tuple]:
         """Get the tip input fields for a game."""
         # Look for tip input fields by their name patterns (more reliable)
-        home_tip_field = SeleniumUtils.safe_find_element(self.driver, By.XPATH, f'{xpath_row}//input[contains(@name, "heimTipp")]', timeout=2, retry_count=1)
-        away_tip_field = SeleniumUtils.safe_find_element(self.driver, By.XPATH, f'{xpath_row}//input[contains(@name, "gastTipp")]', timeout=2, retry_count=1)
+        home_tip_field = SeleniumUtils.safe_find_element(
+            self.driver, By.XPATH, f'{xpath_row}//input[contains(@name, "heimTipp")]', timeout=2, retry_count=1)
+        away_tip_field = SeleniumUtils.safe_find_element(
+            self.driver, By.XPATH, f'{xpath_row}//input[contains(@name, "gastTipp")]', timeout=2, retry_count=1)
 
         if home_tip_field and away_tip_field:
             return home_tip_field, away_tip_field
         else:
             # Game is likely over or not available for tipping
-            result_element = SeleniumUtils.safe_find_element(self.driver, By.XPATH, f'{xpath_row}/td[4]')
+            result_element = SeleniumUtils.safe_find_element(
+                self.driver, By.XPATH, f'{xpath_row}/td[4]')
             if result_element:
-                result_text = SeleniumUtils.safe_get_attribute(result_element, 'innerHTML', 'game result')
+                result_text = SeleniumUtils.safe_get_attribute(
+                    result_element, 'innerHTML', 'game result')
                 if result_text:
-                    logger.debug(f"Game is over or not available: {result_text.replace(':', ' - ')}")
+                    logger.debug(
+                        f"Game is over or not available: {result_text.replace(':', ' - ')}")
                 else:
                     logger.debug("Game status unknown")
             else:
@@ -281,8 +310,10 @@ class GameTipper:
 
     def _is_already_tipped(self, home_field, away_field) -> bool:
         """Check if the game has already been tipped."""
-        home_value = SeleniumUtils.safe_get_attribute(home_field, 'value', 'home tip field') or ''
-        away_value = SeleniumUtils.safe_get_attribute(away_field, 'value', 'away tip field') or ''
+        home_value = SeleniumUtils.safe_get_attribute(
+            home_field, 'value', 'home tip field') or ''
+        away_value = SeleniumUtils.safe_get_attribute(
+            away_field, 'value', 'away tip field') or ''
         return bool(home_value and away_value)
 
     def _should_tip_game(self, game_time: datetime) -> bool:
@@ -291,20 +322,24 @@ class GameTipper:
         logger.debug(f"Time until game: {time_until_game}")
 
         if time_until_game > Config.TIME_UNTIL_GAME:
-            logger.info(f"Game starts in more than {Config.TIME_UNTIL_GAME}. Skipping...")
+            logger.info(
+                f"Game starts in more than {Config.TIME_UNTIL_GAME}. Skipping...")
             return False
 
-        logger.info(f"Game starts in less than {Config.TIME_UNTIL_GAME}. Proceeding with tip...")
+        logger.info(
+            f"Game starts in less than {Config.TIME_UNTIL_GAME}. Proceeding with tip...")
         return True
 
     def _extract_quotes(self, xpath_row: str) -> Optional[list]:
         """Extract betting quotes from the game row."""
-        quotes_element = SeleniumUtils.safe_find_element(self.driver, By.XPATH, f'{xpath_row}/td[5]/a')
+        quotes_element = SeleniumUtils.safe_find_element(
+            self.driver, By.XPATH, f'{xpath_row}/td[5]/a')
         if not quotes_element:
             logger.warning("Could not find quotes element")
             return None
 
-        quotes_raw = SeleniumUtils.safe_get_attribute(quotes_element, 'innerHTML', 'quotes element')
+        quotes_raw = SeleniumUtils.safe_get_attribute(
+            quotes_element, 'innerHTML', 'quotes element')
         if not quotes_raw:
             logger.warning("Could not extract quotes content")
             return None
@@ -359,16 +394,19 @@ class GameTipper:
         # Wait a moment for any dynamic updates to the form
         sleep(1)
 
-        submit_button = SeleniumUtils.safe_find_element(self.driver, By.NAME, "submitbutton")
+        submit_button = SeleniumUtils.safe_find_element(
+            self.driver, By.NAME, "submitbutton")
         if not submit_button:
-            logger.error("Could not find submit button with name 'submitbutton'")
+            logger.error(
+                "Could not find submit button with name 'submitbutton'")
             raise GameTippingError("Submit button not found")
 
         logger.debug("Found submit button, attempting to click")
 
         # Try to scroll the button into view first
         try:
-            self.driver.execute_script("arguments[0].scrollIntoView(true);", submit_button)
+            self.driver.execute_script(
+                "arguments[0].scrollIntoView(true);", submit_button)
             sleep(0.5)  # Brief pause after scrolling
             logger.debug("Scrolled submit button into view")
         except Exception as e:
@@ -381,7 +419,8 @@ class GameTipper:
             # Fallback to JavaScript click
             logger.info("Regular click failed, trying JavaScript click")
             try:
-                self.driver.execute_script("arguments[0].click();", submit_button)
+                self.driver.execute_script(
+                    "arguments[0].click();", submit_button)
                 logger.info("Tips form submitted successfully via JavaScript")
             except Exception as e:
                 logger.error(f"Both regular and JavaScript clicks failed: {e}")
@@ -434,5 +473,3 @@ class GameTipper:
                     pass
         else:
             logger.debug("No terms dialog found - may already be accepted")
-
-

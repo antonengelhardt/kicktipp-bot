@@ -50,23 +50,27 @@ class SeleniumUtils:
         for attempt in range(retry_count):
             try:
                 wait = WebDriverWait(driver, timeout)
-                element = wait.until(EC.presence_of_element_located((by, value)))
+                element = wait.until(
+                    EC.presence_of_element_located((by, value)))
                 logger.debug(f"Element found: {by}='{value}'")
                 return element
 
             except TimeoutException:
-                logger.warning(f"Element not found (attempt {attempt + 1}/{retry_count}): {by}='{value}'")
+                logger.warning(
+                    f"Element not found (attempt {attempt + 1}/{retry_count}): {by}='{value}'")
                 if attempt < retry_count - 1:
                     sleep(SeleniumUtils.DEFAULT_RETRY_DELAY)
 
             except WebDriverException as e:
-                logger.error(f"WebDriver error finding element {by}='{value}': {e}")
+                logger.error(
+                    f"WebDriver error finding element {by}='{value}': {e}")
                 if attempt < retry_count - 1:
                     sleep(SeleniumUtils.DEFAULT_RETRY_DELAY)
                 else:
                     break
 
-        logger.error(f"Failed to find element after {retry_count} attempts: {by}='{value}'")
+        logger.error(
+            f"Failed to find element after {retry_count} attempts: {by}='{value}'")
         return None
 
     @staticmethod
@@ -90,7 +94,8 @@ class SeleniumUtils:
         """
         try:
             wait = WebDriverWait(driver, timeout)
-            elements = wait.until(EC.presence_of_all_elements_located((by, value)))
+            elements = wait.until(
+                EC.presence_of_all_elements_located((by, value)))
             logger.debug(f"Found {len(elements)} elements: {by}='{value}'")
             return elements
 
@@ -99,7 +104,8 @@ class SeleniumUtils:
             return []
 
         except WebDriverException as e:
-            logger.error(f"WebDriver error finding elements {by}='{value}': {e}")
+            logger.error(
+                f"WebDriver error finding elements {by}='{value}': {e}")
             return []
 
     @staticmethod
@@ -121,21 +127,25 @@ class SeleniumUtils:
                 return True
 
             except ElementNotInteractableException as e:
-                logger.warning(f"Element not interactable (attempt {attempt + 1}): {element_name}")
+                logger.warning(
+                    f"Element not interactable (attempt {attempt + 1}): {element_name}")
                 # Add debugging information about the element
                 try:
                     is_displayed = element.is_displayed()
                     is_enabled = element.is_enabled()
                     tag_name = element.tag_name
-                    logger.debug(f"Element debug - displayed: {is_displayed}, enabled: {is_enabled}, tag: {tag_name}")
+                    logger.debug(
+                        f"Element debug - displayed: {is_displayed}, enabled: {is_enabled}, tag: {tag_name}")
                 except Exception as debug_e:
-                    logger.debug(f"Could not get element debug info: {debug_e}")
+                    logger.debug(
+                        f"Could not get element debug info: {debug_e}")
 
                 if attempt < SeleniumUtils.DEFAULT_RETRY_COUNT - 1:
                     sleep(SeleniumUtils.DEFAULT_RETRY_DELAY)
 
             except StaleElementReferenceException:
-                logger.warning(f"Stale element reference (attempt {attempt + 1}): {element_name}")
+                logger.warning(
+                    f"Stale element reference (attempt {attempt + 1}): {element_name}")
                 return False  # Element needs to be re-found
 
             except WebDriverException as e:
@@ -143,7 +153,8 @@ class SeleniumUtils:
                 if attempt < SeleniumUtils.DEFAULT_RETRY_COUNT - 1:
                     sleep(SeleniumUtils.DEFAULT_RETRY_DELAY)
 
-        logger.error(f"Failed to click {element_name} after {SeleniumUtils.DEFAULT_RETRY_COUNT} attempts")
+        logger.error(
+            f"Failed to click {element_name} after {SeleniumUtils.DEFAULT_RETRY_COUNT} attempts")
         return False
 
     @staticmethod
@@ -192,15 +203,18 @@ class SeleniumUtils:
         """
         try:
             value = element.get_attribute(attribute)
-            logger.debug(f"Got attribute '{attribute}' from {element_name}: {value}")
+            logger.debug(
+                f"Got attribute '{attribute}' from {element_name}: {value}")
             return value
 
         except StaleElementReferenceException:
-            logger.error(f"Stale element reference getting attribute: {element_name}")
+            logger.error(
+                f"Stale element reference getting attribute: {element_name}")
             return None
 
         except WebDriverException as e:
-            logger.error(f"Error getting attribute '{attribute}' from {element_name}: {e}")
+            logger.error(
+                f"Error getting attribute '{attribute}' from {element_name}: {e}")
             return None
 
     @staticmethod
@@ -221,7 +235,8 @@ class SeleniumUtils:
             return text
 
         except StaleElementReferenceException:
-            logger.error(f"Stale element reference getting text: {element_name}")
+            logger.error(
+                f"Stale element reference getting text: {element_name}")
             return None
 
         except WebDriverException as e:
@@ -242,7 +257,8 @@ class SeleniumUtils:
         """
         try:
             WebDriverWait(driver, timeout).until(
-                lambda d: d.execute_script("return document.readyState") == "complete"
+                lambda d: d.execute_script(
+                    "return document.readyState") == "complete"
             )
             logger.debug("Page loaded successfully")
             return True
@@ -280,17 +296,21 @@ class SeleniumUtils:
             try:
                 result = operation()
                 if attempt > 0:
-                    logger.info(f"{operation_name} succeeded on attempt {attempt + 1}")
+                    logger.info(
+                        f"{operation_name} succeeded on attempt {attempt + 1}")
                 return result
 
             except Exception as e:
                 last_exception = e
-                logger.warning(f"{operation_name} failed (attempt {attempt + 1}/{retry_count}): {e}")
+                logger.warning(
+                    f"{operation_name} failed (attempt {attempt + 1}/{retry_count}): {e}")
 
                 if attempt < retry_count - 1:
                     delay = retry_delay * (2 ** attempt)  # Exponential backoff
-                    logger.debug(f"Retrying {operation_name} in {delay} seconds...")
+                    logger.debug(
+                        f"Retrying {operation_name} in {delay} seconds...")
                     sleep(delay)
 
-        logger.error(f"{operation_name} failed after {retry_count} attempts. Last error: {last_exception}")
+        logger.error(
+            f"{operation_name} failed after {retry_count} attempts. Last error: {last_exception}")
         return None

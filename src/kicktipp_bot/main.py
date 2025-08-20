@@ -17,6 +17,7 @@ from .core.game_tipper import GameTipper, GameTippingError
 from .core.notifications import NotificationManager
 from .health import health_status, health_monitor
 
+
 def setup_logging(debug_mode: bool = False) -> None:
     """Setup logging configuration."""
     log_level = logging.DEBUG if debug_mode else logging.INFO
@@ -39,6 +40,7 @@ def setup_logging(debug_mode: bool = False) -> None:
 
 
 logger = logging.getLogger(__name__)
+
 
 class KicktippBot:
     """Main bot class that orchestrates the tipping process."""
@@ -66,7 +68,8 @@ class KicktippBot:
             self.authenticator.login()
 
             # Initialize game tipper
-            self.game_tipper = GameTipper(self.driver, self.notification_manager)
+            self.game_tipper = GameTipper(
+                self.driver, self.notification_manager)
 
             # Process all games
             self.game_tipper.tip_all_games()
@@ -99,10 +102,12 @@ class KicktippBot:
             except Exception as e:
                 logger.warning(f"Error closing WebDriver: {e}")
 
+
 def run_bot() -> None:
     """Run a single bot execution cycle."""
     bot = KicktippBot()
     bot.run()
+
 
 def main() -> None:
     """Main entry point for the Kicktipp bot."""
@@ -118,13 +123,13 @@ def main() -> None:
     # Validate configuration
     if not Config.validate_required_config():
         logger.error("Missing required configuration. Please set KICKTIPP_EMAIL, "
-                    "KICKTIPP_PASSWORD and KICKTIPP_NAME_OF_COMPETITION environment variables")
+                     "KICKTIPP_PASSWORD and KICKTIPP_NAME_OF_COMPETITION environment variables")
         sys.exit(1)
 
     logger.info("Kicktipp Bot starting...")
     logger.info(f"Configuration: Competition={Config.NAME_OF_COMPETITION}, "
-               f"Run interval={Config.RUN_EVERY_X_MINUTES}min, "
-               f"Tip threshold={Config.TIME_UNTIL_GAME}")
+                f"Run interval={Config.RUN_EVERY_X_MINUTES}min, "
+                f"Tip threshold={Config.TIME_UNTIL_GAME}")
 
     if debug_mode:
         logger.info("Debug mode enabled - detailed logging active")
@@ -145,7 +150,8 @@ def main() -> None:
                 # Run the bot
                 run_bot()
 
-                logger.info(f"{current_time}: Tipping cycle completed successfully")
+                logger.info(
+                    f"{current_time}: Tipping cycle completed successfully")
 
                 # Send heartbeat notification if configured
                 health_monitor.send_heartbeat_notification()
@@ -158,7 +164,8 @@ def main() -> None:
 
             # Sleep until next cycle
             sleep_minutes = Config.RUN_EVERY_X_MINUTES
-            logger.info(f"Sleeping for {sleep_minutes} minutes until next cycle...")
+            logger.info(
+                f"Sleeping for {sleep_minutes} minutes until next cycle...")
             sleep(sleep_minutes * 60)
 
     except KeyboardInterrupt:
@@ -167,6 +174,7 @@ def main() -> None:
         # Stop health monitoring
         health_monitor.stop_health_server()
         logger.info("Bot shutdown complete")
+
 
 if __name__ == '__main__':
     main()

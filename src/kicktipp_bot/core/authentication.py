@@ -61,12 +61,14 @@ class Authenticator:
         logger.debug("Entering login credentials")
 
         # Find email field
-        email_field = SeleniumUtils.safe_find_element(self.driver, By.ID, "kennung")
+        email_field = SeleniumUtils.safe_find_element(
+            self.driver, By.ID, "kennung")
         if not email_field:
             raise AuthenticationError("Could not find email input field")
 
         # Find password field
-        password_field = SeleniumUtils.safe_find_element(self.driver, By.ID, "passwort")
+        password_field = SeleniumUtils.safe_find_element(
+            self.driver, By.ID, "passwort")
         if not password_field:
             raise AuthenticationError("Could not find password input field")
 
@@ -83,7 +85,8 @@ class Authenticator:
         """Submit the login form."""
         logger.debug("Submitting login form")
 
-        submit_button = SeleniumUtils.safe_find_element(self.driver, By.NAME, "submitbutton")
+        submit_button = SeleniumUtils.safe_find_element(
+            self.driver, By.NAME, "submitbutton")
         if not submit_button:
             raise AuthenticationError("Could not find login submit button")
 
@@ -99,7 +102,8 @@ class Authenticator:
             if current_url == Config.BASE_URL:
                 logger.info("Login verification successful")
             else:
-                raise AuthenticationError(f"Login failed - redirected to: {current_url}")
+                raise AuthenticationError(
+                    f"Login failed - redirected to: {current_url}")
         except WebDriverException as e:
             raise AuthenticationError(f"Could not verify login status: {e}")
 
@@ -119,6 +123,7 @@ class Authenticator:
             if SeleniumUtils.safe_click(accept_button, "terms and conditions accept button"):
                 logger.info("Accepted terms and conditions")
             else:
-                logger.warning("Found terms dialog but failed to click accept button")
+                logger.warning(
+                    "Found terms dialog but failed to click accept button")
         else:
             logger.debug("No terms and conditions dialog found")

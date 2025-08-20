@@ -34,13 +34,16 @@ class NotificationManager:
         """Send all configured notifications."""
         try:
             if self.zapier_enabled:
-                self._send_zapier_webhook(game_time, home_team, away_team, quotes, tip)
+                self._send_zapier_webhook(
+                    game_time, home_team, away_team, quotes, tip)
 
             if self.ntfy_enabled:
-                self._send_ntfy_notification(game_time, home_team, away_team, quotes, tip)
+                self._send_ntfy_notification(
+                    game_time, home_team, away_team, quotes, tip)
 
             if self.webhook_enabled:
-                self._send_webhook_notification(game_time, home_team, away_team, quotes, tip)
+                self._send_webhook_notification(
+                    game_time, home_team, away_team, quotes, tip)
 
         except Exception as e:
             logger.error(f"Error sending notifications: {e}")

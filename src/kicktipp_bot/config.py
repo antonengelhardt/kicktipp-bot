@@ -15,16 +15,19 @@ class Config:
     # Required environment variables
     EMAIL: Optional[str] = os.getenv("KICKTIPP_EMAIL")
     PASSWORD: Optional[str] = os.getenv("KICKTIPP_PASSWORD")
-    NAME_OF_COMPETITION: Optional[str] = os.getenv("KICKTIPP_NAME_OF_COMPETITION")
+    NAME_OF_COMPETITION: Optional[str] = os.getenv(
+        "KICKTIPP_NAME_OF_COMPETITION")
 
     # Optional environment variables with defaults
-    RUN_EVERY_X_MINUTES: Optional[int] = int(os.getenv("KICKTIPP_RUN_EVERY_X_MINUTES", "60"))
+    RUN_EVERY_X_MINUTES: Optional[int] = int(
+        os.getenv("KICKTIPP_RUN_EVERY_X_MINUTES", "60"))
 
     # Chrome driver path
     CHROMEDRIVER_PATH: Optional[str] = os.getenv("CHROMEDRIVER_PATH")
 
     # Time configuration
-    HOURS_UNTIL_GAME: Optional[int] = int(os.getenv("KICKTIPP_HOURS_UNTIL_GAME", "2"))
+    HOURS_UNTIL_GAME: Optional[int] = int(
+        os.getenv("KICKTIPP_HOURS_UNTIL_GAME", "2"))
     TIME_UNTIL_GAME: timedelta = timedelta(hours=HOURS_UNTIL_GAME)
 
     # Notification URLs
