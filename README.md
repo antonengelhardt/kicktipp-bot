@@ -57,6 +57,12 @@ or deploy with Kubernetes.
 | `NTFY_USERNAME`                | The username for your NTFY Webhook                        | `username`                                                        | No       |
 | `NTFY_PASSWORD`                | The password for your NTFY Webhook                        | `password`                                                        | No       |
 | `WEBHOOK_URL`                  | The URL of some generic webhook.                          | `https://your-home-assistant-url.com/api/webhook/your-webhook-id` | No       |
+| `SENTRY_DSN`                   | The Sentry DSN for error reporting.                       | `https://your-sentry-dsn.com`                                     | No       |
+| `SENTRY_ENVIRONMENT`           | The Sentry environment for error reporting.               | `production`                                                      | No       |
+
+## Sentry
+
+If you want to use Sentry for error reporting, you can set the ENV Variable `SENTRY_DSN` to the DSN of your Sentry project. You can also set the ENV Variable `SENTRY_ENVIRONMENT` to the environment of your project.
 
 ## Notifications
 
