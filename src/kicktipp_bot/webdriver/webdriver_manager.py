@@ -26,7 +26,7 @@ class WebDriverManager:
         # Check for headless mode
         if WebDriverManager._is_headless_mode():
             logger.info('Running in headless mode')
-            return webdriver.Chrome(options=WebDriverManager._get_chrome_options())
+            return webdriver.Chrome(options=WebDriverManager._get_headless_options())
 
         # Default mode
         return webdriver.Chrome()
@@ -34,21 +34,18 @@ class WebDriverManager:
     @staticmethod
     def _is_headless_mode() -> bool:
         """Check if the script should run in headless mode."""
-        try:
-            return len(sys.argv) > 1 and '--headless' in sys.argv
-        except IndexError:
-            return False
+        return len(sys.argv) > 1 and '--headless' in sys.argv
 
     @staticmethod
-    def _get_chrome_options() -> Options:
+    def _get_headless_options() -> Options:
         """Configure Chrome options for headless browser operation."""
         chrome_options = Options()
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-
-        # Disable images for better performance
-        chrome_prefs = {"profile.default_content_settings": {"images": 2}}
-        chrome_options.experimental_options["prefs"] = chrome_prefs
+        chrome_options.add_argument("--disable-extensions")
+        chrome_options.add_argument("--disable-application-cache")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--disable-setuid-sandbox")
 
         return chrome_options

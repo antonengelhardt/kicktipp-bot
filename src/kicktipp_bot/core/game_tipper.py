@@ -62,7 +62,7 @@ class GameTipper:
 
             # Process each game
             processed_count = 0
-            for game_index in range(1, games_count):
+            for game_index in range(1, games_count + 1):
                 try:
                     if self._process_single_game(game_index):
                         processed_count += 1
@@ -430,7 +430,7 @@ class GameTipper:
                 # Ensure we switch back to main content
                 try:
                     self.driver.switch_to.default_content()
-                except:
+                except Exception:
                     pass
         else:
             logger.debug("No terms dialog found - may already be accepted")

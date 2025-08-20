@@ -5,8 +5,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.common.exceptions import WebDriverException
 
-from ..config import Config
-from ..utils.selenium_utils import SeleniumUtils
+from config import Config
+from selenium_utils import SeleniumUtils
 
 logger = logging.getLogger(__name__)
 

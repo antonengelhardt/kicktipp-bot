@@ -64,7 +64,7 @@ class Game:
         quote_difference = home_quote - away_quote
 
         # Add randomness for more realistic scores
-        random_goal = round(random.uniform(0, 1))
+        random_goal = random.randint(0, 1)
 
         # Adjust coefficient based on how unequal the match is
         # Lower coefficient for very unequal games to avoid extreme scores
@@ -76,13 +76,13 @@ class Game:
             return random_goal, random_goal
         elif quote_difference < 0:
             # Home team favored
-            home_goals = round(-quote_difference * coefficient) + random_goal
+            home_goals = max(0, round(-quote_difference * coefficient)) + random_goal
             away_goals = random_goal
             return home_goals, away_goals
         else:
             # Away team favored
             home_goals = random_goal
-            away_goals = round(quote_difference * coefficient) + random_goal
+            away_goals = max(0, round(quote_difference * coefficient)) + random_goal
             return home_goals, away_goals
 
     def __str__(self) -> str:

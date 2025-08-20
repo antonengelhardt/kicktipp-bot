@@ -13,9 +13,9 @@ class Config:
     LOGIN_URL = "https://www.kicktipp.de/info/profil/login/"
 
     # Required environment variables
-    EMAIL: str = os.getenv("KICKTIPP_EMAIL")
-    PASSWORD: str = os.getenv("KICKTIPP_PASSWORD")
-    NAME_OF_COMPETITION: str = os.getenv("KICKTIPP_NAME_OF_COMPETITION")
+    EMAIL: Optional[str] = os.getenv("KICKTIPP_EMAIL")
+    PASSWORD: Optional[str] = os.getenv("KICKTIPP_PASSWORD")
+    NAME_OF_COMPETITION: Optional[str] = os.getenv("KICKTIPP_NAME_OF_COMPETITION")
 
     # Optional environment variables with defaults
     RUN_EVERY_X_MINUTES: Optional[int] = int(os.getenv("KICKTIPP_RUN_EVERY_X_MINUTES", "60"))

@@ -17,7 +17,6 @@ from .core.game_tipper import GameTipper, GameTippingError
 from .core.notifications import NotificationManager
 from .health import health_status, health_monitor
 
-
 def setup_logging(debug_mode: bool = False) -> None:
     """Setup logging configuration."""
     log_level = logging.DEBUG if debug_mode else logging.INFO
@@ -38,20 +37,6 @@ def setup_logging(debug_mode: bool = False) -> None:
     logging.getLogger('urllib3').setLevel(logging.WARNING)
     logging.getLogger('requests').setLevel(logging.WARNING)
 
-
-# Configure logging with default settings
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    datefmt='%H:%M:%S'
-)
-
-# Set logging level for all kicktipp_bot modules
-logging.getLogger('kicktipp_bot').setLevel(logging.INFO)
-
-# Reduce selenium logging noise
-logging.getLogger('selenium').setLevel(logging.WARNING)
-logging.getLogger('urllib3').setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
