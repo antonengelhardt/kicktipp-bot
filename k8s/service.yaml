@@ -14,21 +14,3 @@ spec:
       targetPort: health
       protocol: TCP
   type: ClusterIP
----
-# Optional: ServiceMonitor for Prometheus monitoring
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: kicktipp-bot-monitor
-  namespace: kicktipp-bot
-  labels:
-    app: kicktipp-bot
-spec:
-  selector:
-    matchLabels:
-      app: kicktipp-bot
-  endpoints:
-    - port: health
-      path: /status
-      interval: 30s
-      scrapeTimeout: 10s
