@@ -150,8 +150,7 @@ def main() -> None:
                 # Run the bot
                 run_bot()
 
-                logger.info(
-                    f"{current_time}: Tipping cycle completed successfully")
+                logger.info("Tipping cycle completed successfully")
 
                 # Send heartbeat notification if configured
                 health_monitor.send_heartbeat_notification()

@@ -1,6 +1,7 @@
 """Game tipping module for handling the core betting logic."""
 
 import logging
+import re
 import sys
 from datetime import datetime
 from time import sleep
@@ -14,6 +15,7 @@ from ..config import Config
 from ..models.game import Game
 from .notifications import NotificationManager
 from ..utils.selenium_utils import SeleniumUtils
+from .table_processors import TimeExtractor, TableRowProcessor, GameDataExtractor
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +31,11 @@ class GameTipper:
     def __init__(self, driver: WebDriver, notification_manager: NotificationManager):
         self.driver = driver
         self.notification_manager = notification_manager
+        self.table_processor = TableRowProcessor(driver)
+        # State management
+        self.last_seen_time = None
+        self.processed_count = 0
+        self.game_number = 0
 
     def tip_all_games(self) -> None:
         """Process and tip all available games."""
@@ -44,7 +51,7 @@ class GameTipper:
                 raise GameTippingError("Tipping page failed to load")
 
             # Additional wait for dynamic content
-            sleep(2)
+            sleep(1)
 
             # Accept terms and conditions if they appear on the tipping page
             self._accept_terms_and_conditions()
@@ -60,19 +67,9 @@ class GameTipper:
 
             logger.info(f"Found {games_count} games to process")
 
-            # Process each game
-            processed_count = 0
-            for game_index in range(1, games_count + 1):
-                try:
-                    if self._process_single_game(game_index):
-                        processed_count += 1
-                except Exception as e:
-                    logger.error(f"Error processing game {game_index}: {e}")
-                    # Try to accept terms in case they appeared during processing
-                    self._accept_terms_and_conditions()
-                    continue
-
-            logger.info(f"Processed {processed_count} games successfully")
+            # Process games using sequential row processing approach
+            self._reset_state()
+            self._process_all_table_rows()
 
             # Submit all tips (button should always be clickable)
             self._submit_all_tips()
@@ -90,6 +87,19 @@ class GameTipper:
         except Exception as e:
             raise GameTippingError(f"Unexpected error during tipping: {e}")
 
+    def _reset_state(self) -> None:
+        """Reset processing state for a new run."""
+        self.last_seen_time = None
+        self.processed_count = 0
+        self.game_number = 0
+        logger.debug("Reset processing state")
+
+    def _update_last_seen_time(self, new_time: datetime, source: str) -> None:
+        """Update the last seen time and log the change."""
+        self.last_seen_time = new_time
+        logger.debug(
+            f"Updated time from {source}: {self.last_seen_time.strftime('%d.%m.%y %H:%M')}")
+
     def _get_games_count(self) -> int:
         """Get the number of games available for tipping."""
         logger.debug("Counting available games")
@@ -101,8 +111,9 @@ class GameTipper:
             logger.warning("Could not find tipping table (tippabgabeSpiele)")
             return 0
 
+        # Count only datarow elements (actual games, not rowheaders)
         games = SeleniumUtils.safe_find_elements(
-            self.driver, By.CLASS_NAME, "datarow")
+            self.driver, By.XPATH, '//*[@id="tippabgabeSpiele"]/tbody/tr[contains(@class, "datarow")]')
         count = len(games)
         logger.debug(f"Found {count} game rows with class 'datarow'")
 
@@ -122,191 +133,132 @@ class GameTipper:
 
         return count
 
-    def _process_single_game(self, game_index: int) -> bool:
-        """
-        Process a single game for tipping.
+    def _process_all_table_rows(self) -> int:
+        """Process all table rows sequentially, maintaining time state."""
+        logger.debug("Processing table rows sequentially")
 
-        Returns:
-            True if game was processed successfully, False otherwise
-        """
-        logger.debug(f"Processing game {game_index}")
-        xpath_row = f'//*[@id="tippabgabeSpiele"]/tbody/tr[{game_index}]'
+        all_rows = self.table_processor.get_all_table_rows()
+        if not all_rows:
+            logger.warning("No table rows found")
+            return 0
 
-        # Check if row exists
-        if not self._row_exists(xpath_row):
-            logger.debug(f"Row {game_index} does not exist, skipping...")
-            return False
-
-        # Extract game information
-        game_info = self._extract_game_info(game_index)
-        if not game_info:
-            logger.warning(
-                f"Could not extract game info for game {game_index}")
-            return False
-
-        game_time, home_team, away_team = game_info
-
-        logger.info(
-            f"Processing: {home_team} vs {away_team} | Time: {game_time.strftime('%d.%m.%y %H:%M')}")
-
-        # Check if game can be tipped
-        tip_fields = self._get_tip_fields(xpath_row)
-        if not tip_fields:
-            logger.debug(
-                f"Game {game_index} cannot be tipped (likely finished)")
-            return False
-
-        home_tip_field, away_tip_field = tip_fields
-
-        # Check if already tipped
-        if self._is_already_tipped(home_tip_field, away_tip_field):
-            home_val = SeleniumUtils.safe_get_attribute(
-                home_tip_field, 'value', 'home tip field') or ''
-            away_val = SeleniumUtils.safe_get_attribute(
-                away_tip_field, 'value', 'away tip field') or ''
-            logger.info(f"Game already tipped: {home_val} - {away_val}")
-            return False
-
-        # Check timing constraints
-        if not self._should_tip_game(game_time):
-            return False
-
-        # Extract quotes and calculate tip
-        quotes = self._extract_quotes(xpath_row)
-        if not quotes:
-            logger.warning(f"Could not extract quotes for game {game_index}")
-            return False
-
-        logger.debug(f"Quotes: {quotes}")
-
-        try:
-            # Create game object and calculate tip
-            game = Game(home_team, away_team, quotes, game_time)
-            tip = game.calculate_tip()
-
-            logger.info(f"Calculated tip: {tip[0]} - {tip[1]}")
-
-            # Enter the tip
-            if not self._enter_tip(home_tip_field, away_tip_field, tip):
-                logger.error(f"Failed to enter tip for game {game_index}")
-                return False
-
-            # Send notifications
+        for row_index, _ in enumerate(all_rows):
             try:
-                self.notification_manager.send_all_notifications(
-                    game_time, home_team, away_team, quotes, tip
-                )
+                row, row_class = self.table_processor.get_row_safely(
+                    all_rows, row_index)
+                if row is None or row_class is None:
+                    continue
+
+                if 'rowheader' in row_class:
+                    self._process_rowheader(row, row_index)
+                elif 'datarow' in row_class:
+                    self._process_datarow_wrapper(row, row_index)
+
             except Exception as e:
-                logger.warning(
-                    f"Failed to send notifications for game {game_index}: {e}")
-                # Don't fail the whole process for notification errors
+                logger.error(f"Error processing table row {row_index}: {e}")
+                continue
 
-            return True
+        logger.info(f"Processed {self.processed_count} games successfully")
+        return self.processed_count
 
-        except Exception as e:
-            logger.error(f"Error processing game {game_index}: {e}")
-            return False
+    def _process_rowheader(self, row, row_index: int) -> None:
+        """Process a rowheader row to extract time information."""
+        logger.debug(f"Found rowheader row {row_index}")
+        extracted_time = TimeExtractor.extract_from_rowheader(row)
+        if extracted_time:
+            self._update_last_seen_time(extracted_time, "rowheader")
+        else:
+            logger.debug("Could not extract time from rowheader")
 
-    def _row_exists(self, xpath_row: str) -> bool:
-        """Check if a game row exists."""
-        element = SeleniumUtils.safe_find_element(
-            self.driver, By.XPATH, xpath_row, timeout=3)
-        return element is not None
+    def _process_datarow_wrapper(self, row, row_index: int) -> None:
+        """Process a datarow wrapper that handles time state management."""
+        self.game_number += 1
+        logger.debug(
+            f"Processing datarow {self.game_number} (row {row_index}), "
+            f"last_seen_time: {self.last_seen_time.strftime('%d.%m.%y %H:%M') if self.last_seen_time else 'None'}")
 
-    def _extract_game_info(self, game_index: int) -> Optional[tuple]:
-        """Extract game time and team names."""
+        # Get time for this game
+        game_time = TimeExtractor.extract_from_datarow(
+            row, self.last_seen_time)
+
+        # Update last_seen_time if we found a visible time in this datarow
+        if TimeExtractor.has_visible_time(row):
+            self._update_last_seen_time(game_time, "datarow")
+
+        # Process the actual game
+        if self._process_datarow(self.game_number, row, game_time):
+            self.processed_count += 1
+
+    def _process_datarow(self, game_number: int, data_row, game_time: datetime) -> bool:
+        """Process a single game datarow."""
         try:
-            # Find game time (may be in current or previous rows)
-            game_time = self._find_game_time(game_index)
-
-            # Get team names
-            xpath_row = f'//*[@id="tippabgabeSpiele"]/tbody/tr[{game_index}]'
-
-            home_team_element = SeleniumUtils.safe_find_element(
-                self.driver, By.XPATH, f'{xpath_row}/td[2]')
-            if not home_team_element:
-                logger.warning(
-                    f"Could not find home team for game {game_index}")
-                return None
-
-            away_team_element = SeleniumUtils.safe_find_element(
-                self.driver, By.XPATH, f'{xpath_row}/td[3]')
-            if not away_team_element:
-                logger.warning(
-                    f"Could not find away team for game {game_index}")
-                return None
-
-            home_team = SeleniumUtils.safe_get_attribute(
-                home_team_element, 'innerHTML', 'home team')
-            away_team = SeleniumUtils.safe_get_attribute(
-                away_team_element, 'innerHTML', 'away team')
+            # Extract team names using the new extractor
+            home_team = GameDataExtractor.extract_team_name(
+                data_row, 2, 'home')
+            away_team = GameDataExtractor.extract_team_name(
+                data_row, 3, 'away')
 
             if not home_team or not away_team:
                 logger.warning(
-                    f"Could not extract team names for game {game_index}")
-                return None
+                    f"Could not extract team names for game {game_number}")
+                return False
 
-            return game_time, home_team.strip(), away_team.strip()
+            logger.info(
+                f"Processing: {home_team} vs {away_team} | Time: {game_time.strftime('%d.%m.%y %H:%M')}")
+
+            # Get tip fields using the new extractor
+            tip_fields = GameDataExtractor.get_tip_fields(data_row)
+            if not tip_fields:
+                logger.debug(
+                    f"Game {game_number} cannot be tipped (likely finished)")
+                return False
+
+            home_tip_field, away_tip_field = tip_fields
+
+            # Check if already tipped
+            if self._is_already_tipped(home_tip_field, away_tip_field):
+                home_val = SeleniumUtils.safe_get_attribute(
+                    home_tip_field, 'value', 'home tip field') or ''
+                away_val = SeleniumUtils.safe_get_attribute(
+                    away_tip_field, 'value', 'away tip field') or ''
+                logger.info(f"Game already tipped: {home_val} - {away_val}")
+                return False
+
+            # Check timing constraints
+            if not self._should_tip_game(game_time):
+                return False
+
+            # Extract quotes using the new extractor
+            quotes = GameDataExtractor.extract_quotes(data_row)
+            if not quotes:
+                logger.warning(
+                    f"Could not extract quotes for game {game_number}")
+                return False
+
+            logger.debug(f"Quotes: {quotes}")
+
+            # Create game and calculate tip
+            game = Game(home_team, away_team, quotes, game_time)
+            tip = game.calculate_tip()
+            logger.info(f"Calculated tip: {tip[0]} - {tip[1]}")
+
+            # Enter tip and send notifications
+            if self._enter_tip(home_tip_field, away_tip_field, tip):
+                try:
+                    self.notification_manager.send_all_notifications(
+                        game_time, home_team, away_team, quotes, tip
+                    )
+                except Exception as e:
+                    logger.warning(
+                        f"Failed to send notifications for game {game_number}: {e}")
+                return True
+            else:
+                logger.error(f"Failed to enter tip for game {game_number}")
+                return False
 
         except Exception as e:
-            logger.error(
-                f"Error extracting game info for game {game_index}: {e}")
-            return None
-
-    def _find_game_time(self, game_index: int) -> datetime:
-        """Find the game time, looking backwards through rows if needed."""
-        for row_index in range(game_index, 0, -1):
-            xpath_row = f'//*[@id="tippabgabeSpiele"]/tbody/tr[{row_index}]'
-
-            time_element = SeleniumUtils.safe_find_element(
-                self.driver, By.XPATH, f'{xpath_row}/td[1]', timeout=2)
-            if not time_element:
-                continue
-
-            time_text = SeleniumUtils.safe_get_attribute(
-                time_element, 'innerHTML', f'time cell row {row_index}')
-            if not time_text:
-                continue
-
-            time_text = time_text.strip()
-            if time_text:  # Non-empty time cell
-                try:
-                    return datetime.strptime(time_text, '%d.%m.%y %H:%M')
-                except ValueError as e:
-                    logger.debug(
-                        f"Could not parse time '{time_text}' from row {row_index}: {e}")
-                    continue
-
-        # Fallback to current time if no time found
-        logger.warning(
-            "Could not find game time, using current time as fallback")
-        return datetime.now()
-
-    def _get_tip_fields(self, xpath_row: str) -> Optional[tuple]:
-        """Get the tip input fields for a game."""
-        # Look for tip input fields by their name patterns (more reliable)
-        home_tip_field = SeleniumUtils.safe_find_element(
-            self.driver, By.XPATH, f'{xpath_row}//input[contains(@name, "heimTipp")]', timeout=2, retry_count=1)
-        away_tip_field = SeleniumUtils.safe_find_element(
-            self.driver, By.XPATH, f'{xpath_row}//input[contains(@name, "gastTipp")]', timeout=2, retry_count=1)
-
-        if home_tip_field and away_tip_field:
-            return home_tip_field, away_tip_field
-        else:
-            # Game is likely over or not available for tipping
-            result_element = SeleniumUtils.safe_find_element(
-                self.driver, By.XPATH, f'{xpath_row}/td[4]')
-            if result_element:
-                result_text = SeleniumUtils.safe_get_attribute(
-                    result_element, 'innerHTML', 'game result')
-                if result_text:
-                    logger.debug(
-                        f"Game is over or not available: {result_text.replace(':', ' - ')}")
-                else:
-                    logger.debug("Game status unknown")
-            else:
-                logger.debug("Could not find game status element")
-            return None
+            logger.error(f"Error processing game {game_number}: {e}")
+            return False
 
     def _is_already_tipped(self, home_field, away_field) -> bool:
         """Check if the game has already been tipped."""
@@ -329,38 +281,6 @@ class GameTipper:
         logger.info(
             f"Game starts in less than {Config.TIME_UNTIL_GAME}. Proceeding with tip...")
         return True
-
-    def _extract_quotes(self, xpath_row: str) -> Optional[list]:
-        """Extract betting quotes from the game row."""
-        quotes_element = SeleniumUtils.safe_find_element(
-            self.driver, By.XPATH, f'{xpath_row}/td[5]/a')
-        if not quotes_element:
-            logger.warning("Could not find quotes element")
-            return None
-
-        quotes_raw = SeleniumUtils.safe_get_attribute(
-            quotes_element, 'innerHTML', 'quotes element')
-        if not quotes_raw:
-            logger.warning("Could not extract quotes content")
-            return None
-
-        # Clean up the quotes text
-        quotes_text = quotes_raw.replace("Quote: ", "").strip()
-
-        # Split quotes (try different separators)
-        if " / " in quotes_text:
-            quotes = quotes_text.split(" / ")
-        elif " | " in quotes_text:
-            quotes = quotes_text.split(" | ")
-        else:
-            logger.warning(f"Could not parse quotes format: {quotes_text}")
-            return None
-
-        if len(quotes) != 3:
-            logger.warning(f"Expected 3 quotes, got {len(quotes)}: {quotes}")
-            return None
-
-        return quotes
 
     def _enter_tip(self, home_field, away_field, tip: tuple) -> bool:
         """
