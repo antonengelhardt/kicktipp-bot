@@ -4,6 +4,7 @@ import logging
 import re
 import sys
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from time import sleep
 from typing import Optional
 
@@ -205,6 +206,13 @@ class GameTipper:
 
             logger.info(
                 f"Processing: {home_team} vs {away_team} | Time: {game_time.strftime('%d.%m.%y %H:%M')}")
+
+
+            # Prüfe, ob das Spiel bereits begonnen hat (Zeitzonen-sicher, zoneinfo)
+            now_berlin = datetime.now(ZoneInfo('Europe/Berlin'))
+            if game_time <= now_berlin:
+                logger.info(f"Game {game_number} has already started ({game_time.strftime('%d.%m.%y %H:%M %Z')}). Skipping...")
+                return False
 
             # Get tip fields using the new extractor
             tip_fields = GameDataExtractor.get_tip_fields(data_row)
