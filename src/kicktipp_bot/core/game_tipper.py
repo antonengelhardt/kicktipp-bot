@@ -75,7 +75,7 @@ class GameTipper:
             self._submit_all_tips()
 
             # Debug mode sleep
-            if self._is_debug_mode():
+            if self._is_debug_mode() and Config.RUN_EVERY_X_MINUTES != 0:
                 logger.info(
                     "Local debug mode - sleeping for 20 seconds to review results")
                 sleep(20)
