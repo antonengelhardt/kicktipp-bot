@@ -21,6 +21,7 @@ class Config:
     # Optional environment variables with defaults
     RUN_EVERY_X_MINUTES: Optional[int] = int(
         os.getenv("KICKTIPP_RUN_EVERY_X_MINUTES", "60"))
+    OVERWRITE_TIPS: Optional[bool] = os.getenv("OVERWRITE_TIPS", "false").lower() == "true"
 
     # Chrome driver path
     CHROMEDRIVER_PATH: Optional[str] = os.getenv("CHROMEDRIVER_PATH")

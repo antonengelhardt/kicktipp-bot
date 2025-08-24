@@ -224,7 +224,7 @@ class GameTipper:
             home_tip_field, away_tip_field = tip_fields
 
             # Check if already tipped
-            if self._is_already_tipped(home_tip_field, away_tip_field):
+            if not Config.OVERWRITE_TIPS and self._is_already_tipped(home_tip_field, away_tip_field):
                 home_val = SeleniumUtils.safe_get_attribute(
                     home_tip_field, 'value', 'home tip field') or ''
                 away_val = SeleniumUtils.safe_get_attribute(
