@@ -115,14 +115,15 @@ def main() -> None:
     """Main entry point for the Kicktipp bot."""
     # Check for debug mode
     debug_mode = len(sys.argv) > 1 and '--debug' in sys.argv
-    if debug_mode:
-        logger.info("Debug mode enabled - detailed logging active")
 
     # Setup logging with appropriate level
     setup_logging(debug_mode)
 
     # Get logger after setup
     logger = logging.getLogger(__name__)
+
+    if debug_mode:
+        logger.info("Debug mode enabled - detailed logging active")
 
     # Validate configuration
     if not Config.validate_required_config():

@@ -278,7 +278,7 @@ class GameTipper:
 
     def _should_tip_game(self, game_time: datetime) -> bool:
         """Check if the game should be tipped based on timing."""
-        time_until_game = game_time - datetime.now()
+        time_until_game = game_time - datetime.now(ZoneInfo('Europe/Berlin'))
         logger.debug(f"Time until game: {time_until_game}")
 
         if time_until_game > Config.TIME_UNTIL_GAME:
