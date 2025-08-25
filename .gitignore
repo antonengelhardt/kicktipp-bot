@@ -11,3 +11,10 @@ my-secrets.yaml
 
 # Chromedriver (if it is stored in the project)
 chromedriver
+
+# Python
+/.venv/
+__pycache__/
+
+# VS Code
+/.vscode/

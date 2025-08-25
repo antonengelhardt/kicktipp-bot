@@ -2,6 +2,7 @@
 
 import logging
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from typing import Optional
 
 from selenium.webdriver.common.by import By
@@ -101,12 +102,13 @@ class TimeExtractor:
 
     @staticmethod
     def _parse_time_string(time_text: str) -> datetime:
-        """Parse time string into datetime object."""
+        """Parse time string into Europe/Berlin aware datetime object using zoneinfo."""
         try:
-            return datetime.strptime(time_text, '%d.%m.%y %H:%M')
+            naive_dt = datetime.strptime(time_text, '%d.%m.%y %H:%M')
+            return naive_dt.replace(tzinfo=ZoneInfo('Europe/Berlin'))
         except ValueError as e:
             logger.warning(f"Could not parse time '{time_text}': {e}")
-            return datetime.now()
+            return datetime.now(tz=ZoneInfo('Europe/Berlin'))
 
 
 class TableRowProcessor:
