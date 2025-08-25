@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.2.0] - 2025-08-25
+
+### 🐛 Bug Fixes
+
+- **(time)** Fallback time should also be berlin tz
+- **(ci)** Only push and deploy when repo is not forked
+- **(health)** Fixed healthcheck condition
+- **(k8s)** Increase failure thresholds for probes
+
+### ⚙️ Miscellaneous Tasks
+
+- **(docs)** Add new variable to docs and remaining config
+- Delete unmaintained files and update env
+
 ## [3.1.0] - 2025-08-20
 
 ### 🚀 Features
