@@ -33,7 +33,7 @@ jobs:
       with:
         context: .
         file: docker/Dockerfile
-        push: true
+        push: ${{ github.event.repository.full_name == github.repository }}
         platforms: linux/amd64
         tags: ghcr.io/antonengelhardt/kicktipp-bot:amd64
 
@@ -49,6 +49,7 @@ jobs:
   deploy-to-kubernetes:
     name: Deploy to Kubernetes
     runs-on: ubuntu-latest
+    if: ${{ github.event.repository.full_name == github.repository }}
     needs: push
     steps:
     - name: Deploy to Kubernetes

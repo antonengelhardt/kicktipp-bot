@@ -31,9 +31,9 @@ jobs:
       with:
         context: .
         file: docker/Dockerfile
-        push: true
+        push: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
         platforms: linux/amd64
-        tags: ghcr.io/antonengelhardt/kicktipp-bot:pr-${{ github.event.number }}-amd64
+        tags: ghcr.io/${{ github.repository }}:pr-${{ github.event.number }}-amd64
 
     # - name: Build and push arm64 Docker image
     #   uses: docker/build-push-action@v2
