@@ -79,7 +79,7 @@ class TimeExtractor:
             return fallback_time
         else:
             logger.warning("No time available, using current time")
-            return datetime.now()
+            return datetime.now(tz=ZoneInfo('Europe/Berlin'))
 
     @staticmethod
     def has_visible_time(data_row) -> bool:
