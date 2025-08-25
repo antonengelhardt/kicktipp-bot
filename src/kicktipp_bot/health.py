@@ -16,7 +16,8 @@ class HealthStatus:
     """Tracks the health status of the bot."""
 
     def __init__(self):
-        self.last_heartbeat: Optional[datetime] = None
+        # Start with initial heartbeat
+        self.last_heartbeat: Optional[datetime] = datetime.now()
         self.last_successful_run: Optional[datetime] = None
         self.last_error: Optional[str] = None
         self.total_runs: int = 0
@@ -28,6 +29,11 @@ class HealthStatus:
     def heartbeat(self) -> None:
         """Update the heartbeat timestamp."""
         self.last_heartbeat = datetime.now()
+
+    def mark_ready(self) -> None:
+        """Mark the bot as ready and running."""
+        self.status = "ready"
+        self.heartbeat()
 
     def record_successful_run(self) -> None:
         """Record a successful bot execution."""
@@ -49,11 +55,8 @@ class HealthStatus:
         now = datetime.now()
         uptime = now - self.start_time
 
-        # Determine if bot is healthy based on recent activity
-        is_healthy = (
-            self.last_heartbeat and
-            (now - self.last_heartbeat) < timedelta(minutes=30)
-        )
+        # Determine if bot is healthy based on different criteria
+        is_healthy = self._determine_health(now, uptime)
 
         return {
             "status": self.status,
@@ -71,6 +74,36 @@ class HealthStatus:
                 "success_rate": round(self.successful_runs / max(self.total_runs, 1) * 100, 2)
             }
         }
+
+    def _determine_health(self, now: datetime, uptime: timedelta) -> bool:
+        """Determine if the bot is healthy based on current state and uptime."""
+        # During startup (first 5 minutes), be more lenient
+        if uptime < timedelta(minutes=5):
+            # During startup, consider healthy if:
+            # 1. Status is not 'error' AND
+            # 2. We have a recent heartbeat (within 2 minutes)
+            recent_heartbeat = (
+                self.last_heartbeat and
+                (now - self.last_heartbeat) < timedelta(minutes=2)
+            )
+            return self.status != "error" and recent_heartbeat
+
+        # After startup, use stricter criteria based on run interval
+        # Import here to avoid circular imports
+        from .config import Config
+
+        # Get the run interval and add a 50% buffer
+        run_interval_minutes = Config.RUN_EVERY_X_MINUTES or 60
+        health_timeout_minutes = int(run_interval_minutes * 1.5)  # 50% buffer
+
+        if self.last_heartbeat:
+            time_since_heartbeat = now - self.last_heartbeat
+            minutes_since_heartbeat = time_since_heartbeat.total_seconds() / 60
+            is_healthy = minutes_since_heartbeat < health_timeout_minutes
+            return is_healthy
+        else:
+            logger.warning("Health check: No heartbeat recorded yet")
+            return False
 
 
 class HealthCheckHandler(BaseHTTPRequestHandler):
