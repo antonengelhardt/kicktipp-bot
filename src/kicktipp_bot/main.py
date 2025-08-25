@@ -154,8 +154,7 @@ def main() -> None:
     try:
         while True:
             try:
-                current_time = datetime.now().strftime('%d.%m.%y %H:%M')
-                logger.info(f"{current_time}: Starting tipping cycle")
+                logger.info("Starting tipping cycle")
 
                 # Update heartbeat
                 health_status.heartbeat()
@@ -184,7 +183,6 @@ def main() -> None:
                 f"Sleeping for {sleep_minutes} minutes until next cycle at {datetime.fromtimestamp(next_run).strftime('%d.%m.%y %H:%M:%S')}")
             while (remaining := next_run - datetime.now().timestamp()) > 0:
                 sleep(min(10, remaining))
-
 
     except KeyboardInterrupt:
         logger.info("Bot stopped by user")

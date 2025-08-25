@@ -7,4 +7,5 @@ data:
   # optional environment variables
   KICKTIPP_HOURS_UNTIL_GAME: "10"
   KICKTIPP_RUN_EVERY_X_MINUTES: "30"
+  OVERWRITE_TIPS: "false"
   SENTRY_ENVIRONMENT: "production"

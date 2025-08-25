@@ -44,21 +44,22 @@ or deploy with Kubernetes.
 
 ## Environment Variables
 
-| Variable                       | Description                                               | Example                                                           | Required |
-| ------------------------------ | --------------------------------------------------------- | ----------------------------------------------------------------- | -------- |
-| `KICKTIPP_EMAIL`               | Your Kicktipp email                                       | `email@example.com`                                               | Yes      |
-| `KICKTIPP_PASSWORD`            | Your Kicktipp password                                    | `password`                                                        | Yes      |
-| `KICKTIPP_NAME_OF_COMPETITION` | The name of the competition you want to tip for           | `mycoolfriendgroup`                                               | Yes      |
-| `KICKTIPP_HOURS_UNTIL_GAME`    | The script will tip games which start in the next x hours | `24`                                                              | No       |
-| `KICKTIPP_RUN_EVERY_X_MINUTES` | The script will run every x minutes                       | `60`                                                              | No       |
-| `CHROMEDRIVER_PATH`            | The path to the chromedriver binary                       | `/usr/bin/chromedriver`                                           | No       |
-| `ZAPIER_URL`                   | The URL of your Zapier Webhook                            | `https://hooks.zapier.com/hooks/catch/123456/abcdef/`             | No       |
-| `NTFY_URL`                     | The URL of your NTFY Webhook                              | `https://ntfy.your-domain.com`                                    | No       |
-| `NTFY_USERNAME`                | The username for your NTFY Webhook                        | `username`                                                        | No       |
-| `NTFY_PASSWORD`                | The password for your NTFY Webhook                        | `password`                                                        | No       |
-| `WEBHOOK_URL`                  | The URL of some generic webhook.                          | `https://your-home-assistant-url.com/api/webhook/your-webhook-id` | No       |
-| `SENTRY_DSN`                   | The Sentry DSN for error reporting.                       | `https://your-sentry-dsn.com`                                     | No       |
-| `SENTRY_ENVIRONMENT`           | The Sentry environment for error reporting.               | `production`                                                      | No       |
+| Variable                       | Description                                                          | Example                                                           | Required |
+| ------------------------------ | -------------------------------------------------------------------- | ----------------------------------------------------------------- | -------- |
+| `KICKTIPP_EMAIL`               | Your Kicktipp email                                                  | `email@example.com`                                               | Yes      |
+| `KICKTIPP_PASSWORD`            | Your Kicktipp password                                               | `password`                                                        | Yes      |
+| `KICKTIPP_NAME_OF_COMPETITION` | The name of the competition you want to tip for                      | `mycoolfriendgroup`                                               | Yes      |
+| `KICKTIPP_HOURS_UNTIL_GAME`    | The script will tip games which start in the next x hours            | `24`                                                              | No       |
+| `KICKTIPP_RUN_EVERY_X_MINUTES` | The script will run every x minutes                                  | `60`                                                              | No       |
+| `OVERWRITE_TIPS`               | If set to `true`, tips for already tipped games will be overwritten. | `false`                                                           | No       |
+| `CHROMEDRIVER_PATH`            | The path to the chromedriver binary                                  | `/usr/bin/chromedriver`                                           | No       |
+| `ZAPIER_URL`                   | The URL of your Zapier Webhook                                       | `https://hooks.zapier.com/hooks/catch/123456/abcdef/`             | No       |
+| `NTFY_URL`                     | The URL of your NTFY Webhook                                         | `https://ntfy.your-domain.com`                                    | No       |
+| `NTFY_USERNAME`                | The username for your NTFY Webhook                                   | `username`                                                        | No       |
+| `NTFY_PASSWORD`                | The password for your NTFY Webhook                                   | `password`                                                        | No       |
+| `WEBHOOK_URL`                  | The URL of some generic webhook.                                     | `https://your-home-assistant-url.com/api/webhook/your-webhook-id` | No       |
+| `SENTRY_DSN`                   | The Sentry DSN for error reporting.                                  | `https://your-sentry-dsn.com`                                     | No       |
+| `SENTRY_ENVIRONMENT`           | The Sentry environment for error reporting.                          | `production`                                                      | No       |
 
 ## Sentry
 
