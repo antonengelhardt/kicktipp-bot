@@ -208,10 +208,10 @@ class GameTipper:
                 f"Processing: {home_team} vs {away_team} | Time: {game_time.strftime('%d.%m.%y %H:%M')}")
 
 
-            # Prüfe, ob das Spiel bereits begonnen hat (Zeitzonen-sicher, zoneinfo)
+            # Check if the game has already started (timezone-safe, zoneinfo)  
             now_berlin = datetime.now(ZoneInfo('Europe/Berlin'))
             if game_time <= now_berlin:
-                logger.info(f"Game {game_number} has already started ({game_time.strftime('%d.%m.%y %H:%M %Z')}). Skipping...")
+                logger.info(f"Game {game_number} has already started ({game_time.strftime('%d.%m.%y %H:%M %z')}). Skipping...")
                 return False
 
             # Get tip fields using the new extractor

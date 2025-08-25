@@ -181,7 +181,7 @@ def main() -> None:
                 return
             next_run = datetime.now().timestamp() + sleep_minutes * 60
             logger.info(
-                f"Sleeping for {sleep_minutes} minutes until next cycle at {next_run}")
+                f"Sleeping for {sleep_minutes} minutes until next cycle at {datetime.fromtimestamp(next_run).strftime('%d.%m.%y %H:%M:%S')}")
             while (remaining := next_run - datetime.now().timestamp()) > 0:
                 sleep(min(10, remaining))
 
