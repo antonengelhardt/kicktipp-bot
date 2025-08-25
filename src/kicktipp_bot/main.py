@@ -115,14 +115,15 @@ def main() -> None:
     """Main entry point for the Kicktipp bot."""
     # Check for debug mode
     debug_mode = len(sys.argv) > 1 and '--debug' in sys.argv
-    if debug_mode:
-        logger.info("Debug mode enabled - detailed logging active")
 
     # Setup logging with appropriate level
     setup_logging(debug_mode)
 
     # Get logger after setup
     logger = logging.getLogger(__name__)
+
+    if debug_mode:
+        logger.info("Debug mode enabled - detailed logging active")
 
     # Validate configuration
     if not Config.validate_required_config():
@@ -178,9 +179,14 @@ def main() -> None:
 
             # Sleep until next cycle
             sleep_minutes = Config.RUN_EVERY_X_MINUTES
+            if sleep_minutes == 0:
+                logger.info("Repetition time is 0, shutting down")
+                return
+            next_run = datetime.now().timestamp() + sleep_minutes * 60
             logger.info(
-                f"Sleeping for {sleep_minutes} minutes until next cycle...")
-            sleep(sleep_minutes * 60)
+                f"Sleeping for {sleep_minutes} minutes until next cycle at {datetime.fromtimestamp(next_run).strftime('%d.%m.%y %H:%M:%S')}")
+            while (remaining := next_run - datetime.now().timestamp()) > 0:
+                sleep(min(10, remaining))
 
     except KeyboardInterrupt:
         logger.info("Bot stopped by user")

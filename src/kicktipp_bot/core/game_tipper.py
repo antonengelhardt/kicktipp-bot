@@ -4,6 +4,7 @@ import logging
 import re
 import sys
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from time import sleep
 from typing import Optional
 
@@ -75,7 +76,7 @@ class GameTipper:
             self._submit_all_tips()
 
             # Debug mode sleep
-            if self._is_debug_mode():
+            if self._is_debug_mode() and Config.RUN_EVERY_X_MINUTES != 0:
                 logger.info(
                     "Local debug mode - sleeping for 20 seconds to review results")
                 sleep(20)
@@ -206,6 +207,13 @@ class GameTipper:
             logger.info(
                 f"Processing: {home_team} vs {away_team} | Time: {game_time.strftime('%d.%m.%y %H:%M')}")
 
+
+            # Check if the game has already started (timezone-safe, zoneinfo)  
+            now_berlin = datetime.now(ZoneInfo('Europe/Berlin'))
+            if game_time <= now_berlin:
+                logger.info(f"Game {game_number} has already started ({game_time.strftime('%d.%m.%y %H:%M %z')}). Skipping...")
+                return False
+
             # Get tip fields using the new extractor
             tip_fields = GameDataExtractor.get_tip_fields(data_row)
             if not tip_fields:
@@ -216,7 +224,7 @@ class GameTipper:
             home_tip_field, away_tip_field = tip_fields
 
             # Check if already tipped
-            if self._is_already_tipped(home_tip_field, away_tip_field):
+            if not Config.OVERWRITE_TIPS and self._is_already_tipped(home_tip_field, away_tip_field):
                 home_val = SeleniumUtils.safe_get_attribute(
                     home_tip_field, 'value', 'home tip field') or ''
                 away_val = SeleniumUtils.safe_get_attribute(
@@ -270,7 +278,7 @@ class GameTipper:
 
     def _should_tip_game(self, game_time: datetime) -> bool:
         """Check if the game should be tipped based on timing."""
-        time_until_game = game_time - datetime.now()
+        time_until_game = game_time - datetime.now(ZoneInfo('Europe/Berlin'))
         logger.debug(f"Time until game: {time_until_game}")
 
         if time_until_game > Config.TIME_UNTIL_GAME:
