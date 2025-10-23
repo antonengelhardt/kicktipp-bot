@@ -187,31 +187,79 @@ class GameDataExtractor:
 
     @staticmethod
     def extract_quotes(game_row) -> Optional[list]:
-        """Extract betting quotes directly from a game row element."""
-        quotes_element = SeleniumUtils.safe_find_element(
-            game_row, By.XPATH, './/a[contains(@class, "quote-link")]')
-        if not quotes_element:
-            logger.warning("Could not find quotes element")
-            return None
+        """
+        Extract betting quotes in the order [1, X, 2].
+        Supports both new DOM (div.tippabgabe-quoten > a.quote > spans)
+        and legacy format (a.quote-link).
+        Returns a list of 3 strings or None if not found.
+        """
+        # --- New DOM structure ---
+        try:
+            container = SeleniumUtils.safe_find_element(
+                game_row,
+                By.XPATH,
+                './/div[contains(@class, "tippabgabe-quoten")]'
+            )
+            if not container:
+                # fallback: sometimes quotes are inside td.quoten
+                container = SeleniumUtils.safe_find_element(
+                    game_row,
+                    By.XPATH,
+                    './/td[contains(@class, "quoten")]'
+                )
 
-        quotes_raw = SeleniumUtils.safe_get_text(
-            quotes_element, 'quotes element')
-        if not quotes_raw:
-            logger.warning("Could not extract quotes content")
-            return None
+            if container:
+                anchors = SeleniumUtils.safe_find_elements(
+                    container,
+                    By.XPATH,
+                    './/a[contains(@class, "quote")]'
+                )
+                if anchors and len(anchors) >= 3:
+                    pairs = []
+                    for a in anchors:
+                        label_el = SeleniumUtils.safe_find_element(
+                            a, By.XPATH, './/span[contains(@class, "quote-label")]'
+                        )
+                        text_el = SeleniumUtils.safe_find_element(
+                            a, By.XPATH, './/span[contains(@class, "quote-text")]'
+                        )
+                        label = SeleniumUtils.safe_get_text(label_el, 'quote label') if label_el else None
+                        value = SeleniumUtils.safe_get_text(text_el, 'quote text') if text_el else None
+                        if label and value:
+                            pairs.append((label.strip(), value.strip()))
 
-        quotes_text = quotes_raw.replace("Quote: ", "").strip()
+                    if pairs:
+                        mapping = {lbl: val for (lbl, val) in pairs}
+                        ordered = [mapping.get('1'), mapping.get('X'), mapping.get('2')]
+                        if all(ordered) and len(ordered) == 3:
+                            return ordered
+                        else:
+                            logger.warning(f"Incomplete quote mapping: {mapping}")
+        except Exception as e:
+            logger.warning(f"Error parsing quotes (new DOM): {e}")
 
-        if " / " in quotes_text:
-            quotes = quotes_text.split(" / ")
-        elif " | " in quotes_text:
-            quotes = quotes_text.split(" | ")
-        else:
-            logger.warning(f"Could not parse quotes format: {quotes_text}")
-            return None
+        # --- Legacy fallback ---
+        try:
+            quotes_element = SeleniumUtils.safe_find_element(
+                game_row, By.XPATH, './/a[contains(@class, "quote-link")]'
+            )
+            if quotes_element:
+                quotes_raw = SeleniumUtils.safe_get_text(quotes_element, 'quotes element')
+                if quotes_raw:
+                    txt = quotes_raw.replace("Quote: ", "").strip()
+                    if " / " in txt:
+                        parts = [p.strip() for p in txt.split(" / ")]
+                    elif " | " in txt:
+                        parts = [p.strip() for p in txt.split(" | ")]
+                    else:
+                        parts = None
 
-        if len(quotes) != 3:
-            logger.warning(f"Expected 3 quotes, got {len(quotes)}: {quotes}")
-            return None
+                    if parts and len(parts) == 3:
+                        return parts
+                    else:
+                        logger.warning(f"Could not parse legacy quotes format: {txt}")
+        except Exception as e:
+            logger.warning(f"Error parsing quotes (legacy DOM): {e}")
 
-        return quotes
+        logger.warning("Could not find quotes element in any supported format")
+        return None
