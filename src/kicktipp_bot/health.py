@@ -35,6 +35,11 @@ class HealthStatus:
         self.status = "ready"
         self.heartbeat()
 
+    def mark_sleeping(self) -> None:
+        """Mark the bot as sleeping between cycles."""
+        self.status = "sleeping"
+        self.heartbeat()
+
     def record_successful_run(self) -> None:
         """Record a successful bot execution."""
         self.last_successful_run = datetime.now()
@@ -88,19 +93,38 @@ class HealthStatus:
             )
             return self.status != "error" and recent_heartbeat
 
-        # After startup, use stricter criteria based on run interval
         # Import here to avoid circular imports
         from .config import Config
 
-        # Get the run interval and add a 50% buffer
+        # Get the run interval and add a buffer
         run_interval_minutes = Config.RUN_EVERY_X_MINUTES or 60
-        health_timeout_minutes = int(run_interval_minutes * 1.5)  # 50% buffer
 
+        # Check if we have a recent heartbeat (should be updated every 10 seconds during sleep)
         if self.last_heartbeat:
             time_since_heartbeat = now - self.last_heartbeat
             minutes_since_heartbeat = time_since_heartbeat.total_seconds() / 60
-            is_healthy = minutes_since_heartbeat < health_timeout_minutes
-            return is_healthy
+
+            # If heartbeat is very recent (within 1 minute), we're definitely healthy
+            if minutes_since_heartbeat < 1:
+                return True
+
+            # If we're in sleeping status and have a recent successful run, be more lenient
+            if self.status == "sleeping" and self.last_successful_run:
+                time_since_success = now - self.last_successful_run
+                minutes_since_success = time_since_success.total_seconds() / 60
+
+                # Consider healthy if:
+                # 1. We had a successful run recently (within the run interval + buffer)
+                # 2. Heartbeat is reasonably recent (within 2 minutes - allows for some delay)
+                # Add 10 min buffer for successful runs
+                success_timeout = run_interval_minutes + 10
+                return (minutes_since_success < success_timeout and
+                        minutes_since_heartbeat < 2)
+
+            # For other statuses, use standard timeout
+            health_timeout_minutes = int(
+                run_interval_minutes * 1.5)  # 50% buffer
+            return minutes_since_heartbeat < health_timeout_minutes
         else:
             logger.warning("Health check: No heartbeat recorded yet")
             return False
