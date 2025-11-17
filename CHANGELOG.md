@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.2.1] - 2025-11-17
+
+### 🐛 Bug Fixes
+
+- **(table_processors)** Enhance quote extraction to support new and legacy DOM structures
+- **(health)** Add sleeping status and improve health check logic
+
 ## [3.2.0] - 2025-08-25
 
 ### 🐛 Bug Fixes
