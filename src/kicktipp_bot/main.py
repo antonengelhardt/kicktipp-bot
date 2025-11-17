@@ -185,7 +185,12 @@ def main() -> None:
             next_run = datetime.now().timestamp() + sleep_minutes * 60
             logger.info(
                 f"Sleeping for {sleep_minutes} minutes until next cycle at {datetime.fromtimestamp(next_run).strftime('%d.%m.%y %H:%M:%S')}")
+
+            # Mark as sleeping and send periodic heartbeats during sleep
+            health_status.mark_sleeping()
             while (remaining := next_run - datetime.now().timestamp()) > 0:
+                # Send heartbeat every 10 seconds during sleep to keep health check happy
+                health_status.heartbeat()
                 sleep(min(10, remaining))
 
     except KeyboardInterrupt:
