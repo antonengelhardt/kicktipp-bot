@@ -37,6 +37,7 @@ docker run \
 --name kicktipp-bot \
 --platform linux/amd64 \
 --env-file .env \
+-e TZ=Europe/Berlin
 ghcr.io/antonengelhardt/kicktipp-bot:amd64
 ```
 
