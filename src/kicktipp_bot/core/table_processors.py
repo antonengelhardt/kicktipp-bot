@@ -1,12 +1,14 @@
 """Table processing utilities for game tipping."""
 
 import logging
+import re
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from typing import Optional
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.common.exceptions import WebDriverException
 
 from ..utils.selenium_utils import SeleniumUtils
 
@@ -155,6 +157,7 @@ class GameDataExtractor:
     # XPath selectors for quote extraction
     XPATH_QUOTE_ANCHOR = './/a[contains(@class, "quote")]'
     XPATH_QUOTE_SPAN = ".//span[contains(@class, 'quote')][span[contains(@class,'quote-label')] and span[contains(@class,'quote-text')]]"
+    GAME_SECTION_SELECTOR = '.kicktipp-spielabschnitt-markierung'
 
     @staticmethod
     def extract_team_name(data_row, column_index: int, team_type: str) -> Optional[str]:
@@ -188,6 +191,106 @@ class GameDataExtractor:
                     logger.debug(
                         f"Game is over or not available: {result_text}")
             return None
+
+    @staticmethod
+    def extract_game_section(game_row) -> Optional[str]:
+        """Extract the Kicktipp game section marker from a game row."""
+        section_parts = []
+
+        try:
+            section_elements = game_row.find_elements(
+                By.CSS_SELECTOR, GameDataExtractor.GAME_SECTION_SELECTOR)
+        except WebDriverException as e:
+            logger.debug(f"Could not inspect game section marker: {e}")
+            section_elements = []
+
+        for section_element in section_elements:
+            section_text = GameDataExtractor._extract_section_element_text(
+                section_element)
+            if section_text:
+                section_parts.append(section_text)
+
+        section = " ".join(section_parts).strip()
+        if section:
+            logger.debug(f"Found game section marker: '{section}'")
+            return section
+
+        fallback_section = GameDataExtractor._extract_game_section_fallback(
+            game_row)
+        if fallback_section:
+            logger.debug(
+                f"Detected game section marker via fallback text: '{fallback_section}'")
+            return fallback_section
+
+        return None
+
+    @staticmethod
+    def section_disallows_draw(section: Optional[str]) -> bool:
+        """Return True if a Kicktipp game section does not allow draws."""
+        if not section:
+            return False
+
+        normalized = GameDataExtractor._normalize_game_section(section)
+        return (
+            "n.e" in normalized or
+            "a.pso" in normalized or
+            "apso" in normalized or
+            "elfmeterschiessen" in normalized or
+            "penalt" in normalized
+        )
+
+    @staticmethod
+    def _extract_section_element_text(section_element) -> Optional[str]:
+        parts = []
+
+        text = SeleniumUtils.safe_get_text(
+            section_element, 'game section marker')
+        if text:
+            parts.append(text)
+
+        for attribute in ('title', 'aria-label', 'value'):
+            value = SeleniumUtils.safe_get_attribute(
+                section_element, attribute, 'game section marker')
+            if value:
+                parts.append(value)
+
+        section_text = " ".join(parts).strip()
+        return section_text or None
+
+    @staticmethod
+    def _extract_game_section_fallback(game_row) -> Optional[str]:
+        fallback_parts = []
+
+        row_text = SeleniumUtils.safe_get_text(
+            game_row, 'game row section fallback')
+        if row_text:
+            fallback_parts.append(row_text)
+
+        for attribute in ('title', 'aria-label', 'value'):
+            value = SeleniumUtils.safe_get_attribute(
+                game_row, attribute, 'game row section fallback')
+            if value:
+                fallback_parts.append(value)
+
+        fallback_text = " ".join(fallback_parts).strip()
+        if GameDataExtractor.section_disallows_draw(fallback_text):
+            return fallback_text
+
+        return None
+
+    @staticmethod
+    def _normalize_game_section(section: str) -> str:
+        normalized = section.casefold()
+        replacements = {
+            "\u00e4": "ae",
+            "\u00f6": "oe",
+            "\u00fc": "ue",
+            "\u00df": "ss",
+        }
+        for original, replacement in replacements.items():
+            normalized = normalized.replace(original, replacement)
+
+        return re.sub(r"\s+", "", normalized)
 
     @staticmethod
     def extract_quotes(game_row) -> Optional[list]:

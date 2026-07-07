@@ -251,7 +251,22 @@ class GameTipper:
 
             # Create game and calculate tip
             game = Game(home_team, away_team, quotes, game_time)
+            section = GameDataExtractor.extract_game_section(data_row)
+            draws_allowed = not GameDataExtractor.section_disallows_draw(
+                section)
             tip = game.calculate_tip()
+            original_tip = tip
+
+            if not draws_allowed:
+                tip = game.resolve_draw_tip(tip)
+                if tip != original_tip:
+                    logger.info(
+                        "Adjusted no-draw tip for "
+                        f"{home_team} vs {away_team} "
+                        f"({section or 'unknown section'}): "
+                        f"{original_tip[0]} - {original_tip[1]} -> "
+                        f"{tip[0]} - {tip[1]}")
+
             logger.info(f"Calculated tip: {tip[0]} - {tip[1]}")
 
             # Enter tip and send notifications
@@ -346,6 +361,7 @@ class GameTipper:
 
         # Try regular click first
         if SeleniumUtils.safe_click(submit_button, "submit button"):
+            self._validate_submission_result()
             logger.info("Tips form submitted successfully")
         else:
             # Fallback to JavaScript click
@@ -353,10 +369,59 @@ class GameTipper:
             try:
                 self.driver.execute_script(
                     "arguments[0].click();", submit_button)
+                self._validate_submission_result()
                 logger.info("Tips form submitted successfully via JavaScript")
+            except GameTippingError:
+                raise
             except Exception as e:
                 logger.error(f"Both regular and JavaScript clicks failed: {e}")
                 raise GameTippingError("Failed to submit tips form")
+
+    def _validate_submission_result(self) -> None:
+        """Detect known Kicktipp validation errors after submitting tips."""
+        sleep(1)
+        feedback_text = self._get_submission_feedback_text()
+        if self._contains_submission_error(feedback_text):
+            raise GameTippingError(
+                "Kicktipp rejected submitted tips: draw is not possible for "
+                "at least one selected game section")
+
+    def _get_submission_feedback_text(self) -> str:
+        """Collect visible page and alert text after form submission."""
+        feedback_parts = []
+
+        try:
+            alert = self.driver.switch_to.alert
+            alert_text = alert.text
+            if alert_text:
+                feedback_parts.append(alert_text)
+        except WebDriverException:
+            pass
+
+        try:
+            body = self.driver.find_element(By.TAG_NAME, "body")
+            body_text = SeleniumUtils.safe_get_text(
+                body, "submission page body")
+            if body_text:
+                feedback_parts.append(body_text)
+        except WebDriverException as e:
+            logger.debug(f"Could not read submission page body: {e}")
+
+        return "\n".join(feedback_parts)
+
+    @staticmethod
+    def _contains_submission_error(text: str) -> bool:
+        """Return True if submitted tips were rejected by Kicktipp."""
+        normalized = text.casefold()
+        normalized = normalized.replace("\u00f6", "oe")
+
+        return (
+            "nicht alle gesendeten tipps waren korrekt" in normalized or
+            (
+                "unentschieden" in normalized and
+                ("nicht moeglich" in normalized or "nicht moglich" in normalized)
+            )
+        )
 
     def _is_debug_mode(self) -> bool:
         """Check if running in debug mode."""

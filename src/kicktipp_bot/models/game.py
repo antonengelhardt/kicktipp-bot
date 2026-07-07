@@ -43,13 +43,19 @@ class Game:
         except (ValueError, TypeError) as e:
             raise ValueError(f"Invalid quote values: {quotes}") from e
 
-    def calculate_tip(self, home_quote: Union[float, None] = None, away_quote: Union[float, None] = None) -> Tuple[int, int]:
+    def calculate_tip(
+        self,
+        home_quote: Union[float, None] = None,
+        away_quote: Union[float, None] = None,
+        allow_draw: bool = True
+    ) -> Tuple[int, int]:
         """
         Calculate betting tip based on the quotes.
 
         Args:
             home_quote: Quote for home team win (uses self._validated_quotes[0] if None)
             away_quote: Quote for away team win (uses self._validated_quotes[2] if None)
+            allow_draw: Whether equal-score predictions are valid
 
         Returns:
             Tuple of (home_goals, away_goals) prediction
@@ -72,19 +78,44 @@ class Game:
         # Calculate tips based on quote difference
         if abs(quote_difference) < 0.25:
             # Very close match - predict draw-like result
-            return random_goal, random_goal
+            tip = (random_goal, random_goal)
         elif quote_difference < 0:
             # Home team favored
             home_goals = max(
                 0, round(-quote_difference * coefficient)) + random_goal
             away_goals = random_goal
-            return home_goals, away_goals
+            tip = (home_goals, away_goals)
         else:
             # Away team favored
             home_goals = random_goal
             away_goals = max(
                 0, round(quote_difference * coefficient)) + random_goal
-            return home_goals, away_goals
+            tip = (home_goals, away_goals)
+
+        if not allow_draw:
+            return self.resolve_draw_tip(tip, home_quote, away_quote)
+
+        return tip
+
+    def resolve_draw_tip(
+        self,
+        tip: Tuple[int, int],
+        home_quote: Union[float, None] = None,
+        away_quote: Union[float, None] = None
+    ) -> Tuple[int, int]:
+        """Resolve a draw prediction into a one-goal win based on win quotes."""
+        if tip[0] != tip[1]:
+            return tip
+
+        if home_quote is None:
+            home_quote = self._validated_quotes[0]
+        if away_quote is None:
+            away_quote = self._validated_quotes[2]
+
+        if home_quote <= away_quote:
+            return tip[0] + 1, tip[1]
+
+        return tip[0], tip[1] + 1
 
     def __str__(self) -> str:
         """String representation of the game."""
