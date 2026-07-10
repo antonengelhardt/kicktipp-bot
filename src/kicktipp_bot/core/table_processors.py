@@ -153,11 +153,20 @@ class TableRowProcessor:
 
 class GameDataExtractor:
     """Handles extraction of game-specific data from table rows."""
-    
+
     # XPath selectors for quote extraction
     XPATH_QUOTE_ANCHOR = './/a[contains(@class, "quote")]'
     XPATH_QUOTE_SPAN = ".//span[contains(@class, 'quote')][span[contains(@class,'quote-label')] and span[contains(@class,'quote-text')]]"
     GAME_SECTION_SELECTOR = '.kicktipp-spielabschnitt-markierung'
+    NO_DRAW_SECTION_MARKERS = (
+        "n.e",
+        "n.v",
+        "nachverlaengerung",
+        "a.pso",
+        "apso",
+        "elfmeterschiessen",
+        "penalt",
+    )
 
     @staticmethod
     def extract_team_name(data_row, column_index: int, team_type: str) -> Optional[str]:
@@ -231,12 +240,9 @@ class GameDataExtractor:
             return False
 
         normalized = GameDataExtractor._normalize_game_section(section)
-        return (
-            "n.e" in normalized or
-            "a.pso" in normalized or
-            "apso" in normalized or
-            "elfmeterschiessen" in normalized or
-            "penalt" in normalized
+        return any(
+            marker in normalized
+            for marker in GameDataExtractor.NO_DRAW_SECTION_MARKERS
         )
 
     @staticmethod

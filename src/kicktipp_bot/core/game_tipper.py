@@ -212,7 +212,7 @@ class GameTipper:
                 f"Processing: {home_team} vs {away_team} | Time: {game_time.strftime('%d.%m.%y %H:%M')}")
 
 
-            # Check if the game has already started (timezone-safe, zoneinfo)  
+            # Check if the game has already started (timezone-safe, zoneinfo)
             now_berlin = datetime.now(ZoneInfo('Europe/Berlin'))
             if game_time <= now_berlin:
                 logger.info(f"Game {game_number} has already started ({game_time.strftime('%d.%m.%y %H:%M %z')}). Skipping...")
@@ -252,20 +252,9 @@ class GameTipper:
             # Create game and calculate tip
             game = Game(home_team, away_team, quotes, game_time)
             section = GameDataExtractor.extract_game_section(data_row)
-            draws_allowed = not GameDataExtractor.section_disallows_draw(
+            allow_draw = not GameDataExtractor.section_disallows_draw(
                 section)
-            tip = game.calculate_tip()
-            original_tip = tip
-
-            if not draws_allowed:
-                tip = game.resolve_draw_tip(tip)
-                if tip != original_tip:
-                    logger.info(
-                        "Adjusted no-draw tip for "
-                        f"{home_team} vs {away_team} "
-                        f"({section or 'unknown section'}): "
-                        f"{original_tip[0]} - {original_tip[1]} -> "
-                        f"{tip[0]} - {tip[1]}")
+            tip = game.calculate_tip(allow_draw=allow_draw)
 
             logger.info(f"Calculated tip: {tip[0]} - {tip[1]}")
 
