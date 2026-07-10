@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.3.1] - 2026-07-10
+
+### 🚜 Refactor
+
+- Clean up code
+
 ## [3.3.0] - 2026-03-30
 
 ### ⚙️ Miscellaneous Tasks
