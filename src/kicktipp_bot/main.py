@@ -103,7 +103,7 @@ class KicktippBot:
                 self.driver.quit()
                 logger.info("WebDriver closed successfully")
             except Exception as e:
-                logger.warning(f"Error closing WebDriver: {e}")
+                logger.warning(f"Error closing WebDriver: {e}", exc_info=True)
             finally:
                 self.driver = None
         reap_zombie_children()

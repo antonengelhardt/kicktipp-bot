@@ -18,6 +18,8 @@ def reap_zombie_children() -> int:
             pid, _status = os.waitpid(-1, os.WNOHANG)
         except ChildProcessError:
             break
+        except InterruptedError:
+            continue
         if pid == 0:
             break
         reaped += 1
