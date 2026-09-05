@@ -47,5 +47,8 @@ class WebDriverManager:
         chrome_options.add_argument("--disable-application-cache")
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--disable-setuid-sandbox")
+        # Crashpad/breakpad helpers often become zombies after driver.quit()
+        chrome_options.add_argument("--disable-crash-reporter")
+        chrome_options.add_argument("--disable-breakpad")
 
         return chrome_options

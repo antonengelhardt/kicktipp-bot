@@ -18,6 +18,7 @@ from .core.authentication import Authenticator, AuthenticationError
 from .core.game_tipper import GameTipper, GameTippingError
 from .core.notifications import NotificationManager
 from .health import health_status, health_monitor
+from .utils.process import reap_zombie_children
 
 
 def setup_logging(debug_mode: bool = False) -> None:
@@ -102,7 +103,10 @@ class KicktippBot:
                 self.driver.quit()
                 logger.info("WebDriver closed successfully")
             except Exception as e:
-                logger.warning(f"Error closing WebDriver: {e}")
+                logger.warning(f"Error closing WebDriver: {e}", exc_info=True)
+            finally:
+                self.driver = None
+        reap_zombie_children()
 
 
 def run_bot() -> None:
@@ -191,6 +195,7 @@ def main() -> None:
             while (remaining := next_run - datetime.now().timestamp()) > 0:
                 # Send heartbeat every 10 seconds during sleep to keep health check happy
                 health_status.heartbeat()
+                reap_zombie_children()
                 sleep(min(10, remaining))
 
     except KeyboardInterrupt:
