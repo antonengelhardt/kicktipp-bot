@@ -1,8 +1,8 @@
-FROM python:3.10.13-alpine
+FROM python:3.10.21-alpine
 
-# install chromedriver
-RUN apk update && apk add chromium chromium-chromedriver curl && \
-    rm -rf /var/cache/apk/*
+# Current Alpine so apk libexpat is past CVE-2024-45491 / 45492.
+RUN apk upgrade --no-cache && \
+    apk add --no-cache chromium chromium-chromedriver curl
 
 WORKDIR /app
 
