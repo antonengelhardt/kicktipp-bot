@@ -36,25 +36,3 @@ jobs:
         push: ${{ github.event.repository.full_name == github.repository }}
         platforms: linux/amd64
         tags: ghcr.io/antonengelhardt/kicktipp-bot:amd64
-
-    # - name: Build and push arm64 Docker image
-    #   uses: docker/build-push-action@v2
-    #   with:
-    #     context: .
-    #     file: docker/Dockerfile
-    #     push: true
-    #     platforms: linux/arm64
-    #     tags: ghcr.io/antonengelhardt/kicktipp-bot:arm64
-
-  deploy-to-kubernetes:
-    name: Deploy to Kubernetes
-    runs-on: ubuntu-latest
-    if: ${{ github.event.repository.full_name == github.repository }}
-    needs: push
-    steps:
-    - name: Deploy to Kubernetes
-      uses: actions-hub/kubectl@master
-      env:
-        KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
-      with:
-        args: rollout restart deployment kicktipp-bot -n kicktipp-bot
