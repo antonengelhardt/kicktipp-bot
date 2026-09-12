@@ -7,8 +7,6 @@ updates:
       - "dependencies"
     schedule:
       interval: "weekly"
-    reviewers:
-      - "antonengelhardt"
     commit-message:
       prefix: "chore(deps)"
 
@@ -18,8 +16,6 @@ updates:
       - "dependencies"
     schedule:
       interval: "weekly"
-    reviewers:
-      - "antonengelhardt"
     commit-message:
       prefix: "chore(deps)"
 
@@ -29,7 +25,5 @@ updates:
       - "dependencies"
     schedule:
       interval: "weekly"
-    reviewers:
-      - "antonengelhardt"
     commit-message:
       prefix: "chore(deps)"
