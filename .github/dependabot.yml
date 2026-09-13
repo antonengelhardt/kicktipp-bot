@@ -5,6 +5,8 @@ updates:
     directory: "/"
     labels:
       - "dependencies"
+    assignees:
+      - "antonengelhardt"
     schedule:
       interval: "weekly"
     commit-message:
@@ -14,6 +16,8 @@ updates:
     directory: "/"
     labels:
       - "dependencies"
+    assignees:
+      - "antonengelhardt"
     schedule:
       interval: "weekly"
     commit-message:
@@ -23,6 +27,8 @@ updates:
     directory: "/docker"
     labels:
       - "dependencies"
+    assignees:
+      - "antonengelhardt"
     schedule:
       interval: "weekly"
     commit-message:
