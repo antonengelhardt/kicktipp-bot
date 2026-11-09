@@ -1,4 +1,4 @@
-FROM python:3.10.21-alpine
+FROM python:3.15.0-alpine
 
 # Current Alpine so apk libexpat is past CVE-2024-45491 / 45492.
 RUN apk upgrade --no-cache && \
