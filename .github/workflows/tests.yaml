@@ -24,7 +24,7 @@ jobs:
       uses: docker/setup-qemu-action@v4
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v4
 
     - name: Build and push amd64 Docker image
       uses: docker/build-push-action@v2
